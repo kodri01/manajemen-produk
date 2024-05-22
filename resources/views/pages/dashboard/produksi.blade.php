@@ -52,11 +52,12 @@
         </div>
         <table class="table table-hover">
             <thead>
+                <th>#</th>
                 <th>Nama Barang</th>
                 <th>Sisa Stok</th>
                 <th>Status</th>
             </thead>
-            @foreach ($stok as $stok)
+            @foreach ($stokpro as $stok)
                 @php
                     $id_stok = $stok->id;
                     $totalStokMasuk = $stok->stokMasuk->sum('stok_masuk');
@@ -64,23 +65,34 @@
                     $stoks = $totalStokMasuk - $totalStokKeluar;
                     $sto = intval($stoks);
                 @endphp
-                @if ($stoks <= 30)
-                    <tr>
-                        <td>{{ $stok->nama_barang }}</td>
-                        <td>
-                            {{ $sto }}
-                        </td>
-                        <td>
-                            @if ($sto >= 10 && $sto <= 30)
-                                <span class="badge badge-warning">Stok Menipis
-                                @elseif($sto < 10)
-                                    <span class="badge badge-danger"><b>Stok Habis</b>
-                                    </span>
-                            @endif
-                        </td>
-                    </tr>
-                @endif
+
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $stok->nama_barang }}</td>
+                    <td>
+                        {{ $sto }}
+                    </td>
+                    <td>
+                        @if ($sto >= 10 && $sto <= 30)
+                            <span class="badge badge-warning"><b>Stok Menipis</b>
+                            </span>
+                        @elseif($sto < 10)
+                            <span class="badge badge-danger"><b>Stok Habis</b>
+                            </span>
+                        @else
+                            <span class="badge badge-success"><b>Stok Tersedia</b>
+                            </span>
+                        @endif
+                    </td>
+                </tr>
             @endforeach
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-center"><a href="{{ route('persediaan') }}" class=""> >> Liat
+                            Semua Stok</a></td>
+                </tr>
+            </tfoot>
         </table>
+
     </div>
 @endsection

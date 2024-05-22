@@ -33,6 +33,7 @@ class DashboardController extends Controller
 
         $supplier = Supplier::select(DB::raw('COUNT(id) as total'))->first();
         $stok = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('created_at', 'desc')->paginate(3);
+        $stokpro = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('created_at', 'desc')->paginate(10);
         $stok_masuk = StokMasuk::with('produk', 'supplier')->orderBy('created_at', 'desc')->paginate(3);
         $stok_keluar = StokKeluar::with('produk')->orderBy('created_at', 'desc')->paginate(3);
         $transaksi = Transaksi::with(['user'])->orderBy('created_at', 'desc')
@@ -50,7 +51,7 @@ class DashboardController extends Controller
         } elseif ($role->name == 'gudang') {
             return view('pages.dashboard.gudang', compact('masuk', 'title', 'stok', 'stok_masuk', 'stok_keluar', 'keluar', 'totalProduk'));
         } else {
-            return view('pages.dashboard.produksi', compact('title', 'stok', 'resep', 'totalProduk'));
+            return view('pages.dashboard.produksi', compact('title', 'stokpro', 'resep', 'totalProduk'));
         }
     }
 
