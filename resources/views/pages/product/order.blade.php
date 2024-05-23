@@ -97,8 +97,6 @@
                                 <form id="formOrder" action="{{ route('order.store') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
-
-
                                     <div class="card shadow mb-4">
                                         <!-- Card Header - Accordion -->
                                         <div class="col-md-12 mt-2 mb-4 mp-2">
@@ -178,7 +176,7 @@
 
                                                     $stok = $totalStokMasuk - $totalStokKeluar;
                                                 @endphp
-                                                @if ($stok > 10)
+                                                @if ($stok > 30)
                                                     <div></div>
                                                 @else
                                                     <div class="col-sm-3">
@@ -196,7 +194,6 @@
                                                                 </div>
                                                                 <span for="" class="text-center mt-2"
                                                                     style="font-size: 12px">{{ $produk->nama_barang }}</span>
-
                                                             </div>
                                                         </a>
                                                     </div>
