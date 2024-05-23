@@ -194,6 +194,8 @@
                                                                 </div>
                                                                 <span for="" class="text-center mt-2"
                                                                     style="font-size: 12px">{{ $produk->nama_barang }}</span>
+                                                                <span for="" class="text-center"
+                                                                    style="font-size: 12px"><strong>{{ $stok }}</strong></span>
                                                             </div>
                                                         </a>
                                                     </div>
