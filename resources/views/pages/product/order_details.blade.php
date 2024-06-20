@@ -59,7 +59,7 @@
                                             <td>{{ $order->satuan }}</td>
                                             <td>{{ $order->qty }}</td>
                                             <td class="text-right">
-                                                {{ 'Rp ' . number_format($order->harga_barang, 0, ',', '.') }}
+                                                {{ 'Rp ' . number_format($order->harga, 0, ',', '.') }}
                                             </td>
                                             <td class="text-right">
                                                 {{ 'Rp ' . number_format($order->sub_total, 0, ',', '.') }}

@@ -7,6 +7,7 @@ use App\Models\StokKeluar;
 use App\Models\StokMasuk;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -18,7 +19,7 @@ class ProductController extends Controller
     {
         $title = "Product - Stok Barang";
         $judul = "Stok Barang";
-        $products = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('nama_barang', 'asc')->get();
+        $products = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('created_at', 'asc')->get();
         $product = Product::with(['stokMasuk', 'stokKeluar'])->first();
         return view('pages.product.index', compact('title', 'judul', 'products', 'product'));
     }
@@ -30,14 +31,14 @@ class ProductController extends Controller
         $rules = [
             'nama_barang' => 'required|min:3',
             'satuan'  => 'required',
-            'harga'  => 'required',
+            // 'harga'  => 'required',
         ];
 
         $messages = [
             'nama_barang.required'  => 'Nama Barang wajib diisi',
             'nama_barang.min'       => 'Nama Barang minimal 3 karakter',
             'satuan.required'  => 'Satuan wajib dipilih',
-            'harga.required'  => 'Harga wajib diisi',
+            // 'harga.required'  => 'Harga wajib diisi',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
 
@@ -51,7 +52,6 @@ class ProductController extends Controller
             'kode_barang' => $kdBarang,
             'nama_barang' => $request->nama_barang,
             'satuan' => $request->satuan,
-            'harga' => $request->harga,
         ]);
 
         return redirect()->route('product')
@@ -80,7 +80,7 @@ class ProductController extends Controller
         $rules = [
             'nama_barang' => 'required|min:3',
             'satuan'  => 'required',
-            'harga'  => 'required',
+            // 'harga'  => 'required',
 
         ];
 
@@ -88,7 +88,7 @@ class ProductController extends Controller
             'nama_barang.required'  => 'Nama Barang wajib diisi',
             'nama_barang.min'       => 'Nama Barang minimal 3 karakter',
             'satuan.required'  => 'Satuan wajib dipilih',
-            'harga.required'  => 'Harga wajib diisi',
+            // 'harga.required'  => 'Harga wajib diisi',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
 
@@ -99,7 +99,7 @@ class ProductController extends Controller
         $produk = Product::findOrFail($request->id);
         $produk->nama_barang = $request->nama_barang;
         $produk->satuan = $request->satuan;
-        $produk->harga = $request->harga;
+        // $produk->harga = $request->harga;
 
         if ($request->satuan) {
             $kdBarang = "PRD" . $request->satuan . rand(1000, 9999);
@@ -121,7 +121,7 @@ class ProductController extends Controller
 
     public function masuk()
     {
-        $stok_masuk = StokMasuk::with('produk', 'supplier')->orderBy('created_at', 'desc')->get();
+        $stok_masuk = StokMasuk::with('produk', 'supplier')->orderBy('created_at', 'asc')->get();
         $suppliers = Supplier::get();
         $produks = Product::get();
         $title = "Product - Barang Masuk";
@@ -135,6 +135,7 @@ class ProductController extends Controller
             'supplier' => 'required',
             'invoice' => 'required',
             'jml_masuk'     => 'required',
+            'harga'      => 'required',
             'keterangan'      => 'required',
         ];
 
@@ -143,6 +144,7 @@ class ProductController extends Controller
             'invoice.required'  => 'Nomor Invoice Wajib diisi',
             'jml_masuk.required' => 'Quantity Barang wajib diisi',
             'keterangan.required'  => 'Keterangan wajib diisi',
+            'harga.required'  => 'Harga wajib diisi',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
 
@@ -150,8 +152,17 @@ class ProductController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $kdBarang = "PRD" . $request->satuan . rand(1000, 9999) . date('dm');
+
+        $produk = Product::create([
+            'kode_barang' => $kdBarang,
+            'nama_barang' => $request->nama_barang,
+            'satuan' => $request->satuan,
+            'harga' => $request->harga,
+        ]);
+
         StokMasuk::create([
-            'produk_id' => $request->produk,
+            'produk_id' => $produk->id,
             'supplier_id' => $request->supplier,
             'invoice' => $request->invoice,
             'stok_masuk' => $request->jml_masuk,
@@ -295,11 +306,4 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-
-    public function order()
-    {
-        $title = "Product - Orderan Barang";
-        $judul = "Orderan Barang";
-        return view('pages.product.order', compact('title', 'judul'));
-    }
 }

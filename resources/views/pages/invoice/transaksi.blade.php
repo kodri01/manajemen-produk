@@ -53,8 +53,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Kode Barang</th>
-                                                        <th>Nama Barang</th>
+                                                        <th>Kode Product</th>
+                                                        <th>Nama Product</th>
                                                         <th>Quantity</th>
                                                         <th class="text-right">@ Harga</th>
                                                         <th class="text-right">Sub Total</th>
@@ -65,17 +65,17 @@
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>
                                                             <td>
-                                                                {{ $transaksi->produk->kode_barang }}
+                                                                {{ $transaksi->produkSell->kode_product }}
                                                             </td>
                                                             <td>
-                                                                {{ $transaksi->produk->nama_barang }}
+                                                                {{ $transaksi->produkSell->nama_product }}
                                                             </td>
                                                             <td>
                                                                 {{ $transaksi->qty }}
 
                                                             </td>
                                                             <td class="text-right">
-                                                                {{ 'Rp ' . number_format($transaksi->produk->harga, 0, ',', '.') }}
+                                                                {{ 'Rp ' . number_format($transaksi->produkSell->harga_jual, 0, ',', '.') }}
 
                                                             </td>
                                                             <td class="text-right">

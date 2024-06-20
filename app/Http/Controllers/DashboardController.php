@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductSell;
 use App\Models\Resep;
 use App\Models\StokKeluar;
 use App\Models\StokMasuk;
@@ -25,7 +26,8 @@ class DashboardController extends Controller
         $role = Role::where('id', $modelrole->role_id)->first();
 
         $currance = Transaksi::select(DB::raw('SUM(transaksis.sub_total) as total'))->first();
-        $totalProduk = Product::select(DB::raw('COUNT(id) as totalProduk'))->first();
+        $totalProduk = ProductSell::select(DB::raw('COUNT(id) as totalProduk'))->first();
+        $totalBaku = Product::select(DB::raw('COUNT(id) as totalBaku'))->first();
         $masuk = StokMasuk::select(DB::raw('COUNT(id) as total'))->first();
         $keluar = StokKeluar::select(DB::raw('COUNT(id) as total'))->first();
         $resep = Resep::select(DB::raw('COUNT(id) as total'))->first();
@@ -47,9 +49,9 @@ class DashboardController extends Controller
         $usersTransaksi = Transaksi::with('user')->orderBy('no_transaksi')->first();
 
         if ($role->name == 'administrator') {
-            return view('pages.dashboard.index', compact('supplier', 'title', 'stok', 'stok_masuk', 'stok_keluar', 'transaksi', 'usersTransaksi', 'currance', 'totalProduk'));
+            return view('pages.dashboard.index', compact('supplier', 'title', 'stok', 'stok_masuk', 'stok_keluar', 'transaksi', 'usersTransaksi', 'currance', 'totalBaku', 'totalProduk'));
         } elseif ($role->name == 'gudang') {
-            return view('pages.dashboard.gudang', compact('masuk', 'title', 'stok', 'stok_masuk', 'stok_keluar', 'keluar', 'totalProduk'));
+            return view('pages.dashboard.gudang', compact('masuk', 'title', 'stok', 'stok_masuk', 'stok_keluar', 'keluar', 'totalBaku'));
         } else {
             return view('pages.dashboard.produksi', compact('title', 'stokpro', 'resep', 'totalProduk'));
         }

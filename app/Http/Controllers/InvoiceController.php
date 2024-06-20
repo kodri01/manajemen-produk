@@ -17,7 +17,9 @@ class InvoiceController extends Controller
     {
 
         $transaksi = Transaksi::with('user')->where('no_transaksi', '=', $no)->first();
-        $transaksis = Transaksi::with('produk')->where('no_transaksi', '=', $no)->get();
+        $transaksis = Transaksi::with('produkSell')->where('no_transaksi', '=', $no)->get();
+
+
         $total = Transaksi::select(
             DB::raw('SUM(sub_total) as total_harga'),
         )->where('no_transaksi', $no)->first();

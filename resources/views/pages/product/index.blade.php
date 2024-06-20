@@ -6,8 +6,8 @@
     </div>
     <div class="card shadow ">
         <div class="card-header">
-            <h6 class="mb-2 font-weight-bold"><a href="#" data-toggle="modal" data-target="#stokModal"
-                    class="btn btn-primary ">+ Barang</a></h6>
+            {{-- <h6 class="mb-2 font-weight-bold"><a href="#" data-toggle="modal" data-target="#stokModal"
+                    class="btn btn-primary ">+ Barang</a></h6> --}}
             @if (Session::has('success'))
                 <div class="alert alert-success">
                     {{ Session::get('success') }}
@@ -55,22 +55,20 @@
                         @foreach ($products as $produk)
                             @php
                                 $id_produk = $produk->id;
+                                $totalStokMasuk = $produk->stokMasuk->where('produk_id', $id_produk)->sum('stok_masuk');
+                                $totalStokKeluar = $produk->stokKeluar
+                                    ->where('produk_id', $id_produk)
+                                    ->sum('stok_keluar');
+                                $stok = $totalStokMasuk - $totalStokKeluar;
                             @endphp
+
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $produk->kode_barang }}</td>
                                 <td>{{ $produk->nama_barang }}</td>
                                 <td>{{ $produk->satuan }}</td>
                                 <td>
-                                    @php
-                                        $totalStokMasuk = $produk->stokMasuk
-                                            ->where('produk_id', $id_produk)
-                                            ->sum('stok_masuk');
-                                        $totalStokKeluar = $produk->stokKeluar
-                                            ->where('produk_id', $id_produk)
-                                            ->sum('stok_keluar');
-                                    @endphp
-                                    {{ $totalStokMasuk - $totalStokKeluar }}
+                                    {{ $stok }}
                                 </td>
                                 <td>
                                     @if ($produk->stokMasuk->isEmpty())
@@ -108,7 +106,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="stokModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        {{-- <div class="modal fade" id="stokModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
@@ -172,7 +170,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <div class="modal fade" id="produkModalEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
@@ -204,8 +202,7 @@
                                 <div class="col-sm-12 col-md-6 col-lg-6">
                                     <div class="form-floating">
                                         <select class="form-select form-control @error('satuan') is-invalid @enderror"
-                                            id="editProdukSatuan" aria-label="Floating label select example"
-                                            name="satuan">
+                                            id="editProdukSatuan" aria-label="Floating label select example" name="satuan">
                                             <option selected disabled>Pilih Satuan Produk</option>
                                             <option value="L">Liter</option>
                                             <option value="KG">KG</option>
@@ -219,7 +216,7 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                {{-- <div class="col-sm-12 col-md-6 col-lg-6">
                                     <div class="form-floating mb-3">
                                         <input type="text" class="form-control @error('harga') is-invalid @enderror"
                                             id="editProdukHarga" placeholder="Invoice" name="harga">
@@ -228,7 +225,7 @@
                                     @error('harga')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                         <div class="modal-footer">

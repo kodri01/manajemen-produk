@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductSell;
 use App\Models\StokKeluar;
 use App\Models\Transaksi;
 use Carbon\Carbon;
@@ -19,12 +20,12 @@ class TransaksiController extends Controller
     {
         $title = "Transaksi";
         $judul = "Transaksi";
-        $produks = Product::get();
+        $produks = ProductSell::orderBy('created_at', 'asc')->get();
 
         $subQuery = Transaksi::select('no_transaksi', DB::raw('MAX(created_at) as latest_created_at'))
             ->groupBy('no_transaksi');
 
-        $transaksis = Transaksi::with(['produk'])
+        $transaksis = Transaksi::with(['produkSell'])
             ->joinSub($subQuery, 'latest_transaksis', function ($join) {
                 $join->on('transaksis.no_transaksi', '=', 'latest_transaksis.no_transaksi');
             })
@@ -59,7 +60,6 @@ class TransaksiController extends Controller
         $no_transaksi = "TRS" . $date . rand(100000, 999999);
         $harga = $request->harga;
         $sub_total = $request->subtotal;
-        $keterangan = "Transaksi Pada " . Carbon::now()->format('d F Y');
 
 
         for ($i = 0; $i < count($nama_barang); $i++) {
@@ -72,14 +72,12 @@ class TransaksiController extends Controller
                 'sub_total' => $sub_total[$i],
             ]);
 
-            StokKeluar::create([
-                'produk_id' => $nama_barang[$i],
-                'stok_keluar' => $qty[$i],
-                'no_dokumen' => $no_transaksi,
-                'keterangan' => $keterangan,
-            ]);
+            $produk = ProductSell::where('id', $nama_barang[$i])->first();
+            if ($produk) {
+                $produk->qty_out += $qty[$i]; // Menambahkan qty ke qty_out yang sudah ada
+                $produk->save();
+            }
         }
-
 
 
         return redirect()->route('invoice.transaksi', $transaksi->no_transaksi)

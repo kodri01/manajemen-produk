@@ -160,7 +160,7 @@
                             <div class="col-sm-7">
                                 <div class="card shadow mb-4">
                                     <div class="card-header py-3" id="product">
-                                        <h6 class="m-0 font-weight-bold text-primary">List Product</h6>
+                                        <h6 class="m-0 font-weight-bold text-primary">List Bahan Baku</h6>
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
@@ -176,30 +176,26 @@
 
                                                     $stok = $totalStokMasuk - $totalStokKeluar;
                                                 @endphp
-                                                @if ($stok > 30)
-                                                    <div></div>
-                                                @else
-                                                    <div class="col-sm-3">
-                                                        <a href="#" class="btn produk-btn"
-                                                            data-nama-barang="{{ $produk->nama_barang }}"
-                                                            data-satuan="{{ $produk->satuan }}"
-                                                            data-harga="{{ $produk->harga }}"
-                                                            data-id-barang="{{ $produk->id }}">
-                                                            <div class="card shadow" style="width: 110px;height:160px">
-                                                                <div class="container  d-flex align-items-center justify-content-center"
-                                                                    style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
-                                                                    <h1 class="m-0 text-bold text-white">
-                                                                        {{ strtoupper(substr($produk->nama_barang, 0, 1)) }}{{ strtoupper(substr($produk->nama_barang, strpos($produk->nama_barang, ' ') + 1, 1)) }}
-                                                                    </h1>
-                                                                </div>
-                                                                <span for="" class="text-center mt-2"
-                                                                    style="font-size: 12px">{{ $produk->nama_barang }}</span>
-                                                                <span for="" class="text-center"
-                                                                    style="font-size: 12px"><strong>{{ $stok }}</strong></span>
+
+                                                <div class="col-sm-3">
+                                                    <a href="#" class="btn produk-btn"
+                                                        data-nama-barang="{{ $produk->nama_barang }}"
+                                                        data-satuan="{{ $produk->satuan }}"
+                                                        data-harga="{{ $produk->harga }}"
+                                                        data-id-barang="{{ $produk->id }}">
+                                                        <div class="card shadow" style="width: 110px;height:160px">
+                                                            <div class="container  d-flex align-items-center justify-content-center"
+                                                                style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
+                                                                <h1 class="m-0 text-bold text-white">
+                                                                    {{ strtoupper(substr($produk->nama_barang, 0, 1)) }}{{ strtoupper(substr($produk->nama_barang, strpos($produk->nama_barang, ' ') + 1, 1)) }}
+                                                                </h1>
                                                             </div>
-                                                        </a>
-                                                    </div>
-                                                @endif
+                                                            <span for="" class="text-center mt-2"
+                                                                style="font-size: 12px">{{ $produk->nama_barang }}</span>
+
+                                                        </div>
+                                                    </a>
+                                                </div>
                                             @endforeach
                                         </div>
                                     </div>

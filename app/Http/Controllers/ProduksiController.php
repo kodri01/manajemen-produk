@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductSell;
 use App\Models\Resep;
 use App\Models\StokKeluar;
 use Carbon\Carbon;
@@ -19,6 +20,7 @@ class ProduksiController extends Controller
     {
         $title = "Produksi - Data Resep";
         $judul = "Data Resep";
+        $resep = Resep::first();
         $reseps = Resep::with(['produk'])
             ->select(
                 'no_resep',
@@ -28,7 +30,7 @@ class ProduksiController extends Controller
             ->groupBy('no_resep', 'nama_resep', 'keterangan')
             ->get();
         $produks = Product::get();
-        return view('pages.produksi.index', compact('title', 'judul', 'reseps', 'produks'));
+        return view('pages.produksi.index', compact('title', 'judul', 'reseps', 'produks', 'resep'));
     }
 
     /**
@@ -36,11 +38,11 @@ class ProduksiController extends Controller
      */
     public function persediaan()
     {
-        $title = "Produksi - Persediaan Barang";
-        $judul = "Persediaan Barang";
-        $products = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('updated_at', 'desc')->get();
-        $product = Product::with(['stokMasuk', 'stokKeluar'])->first();
-        return view('pages.produksi.persediaan', compact('title', 'judul', 'products', 'product'));
+        $title = "Produksi - Persediaan Produksi";
+        $judul = "Persediaan Produksi";
+        $products = ProductSell::orderBy('created_at', 'asc')->get();
+        // $product = ProductSell::with(['stokMasuk', 'stokKeluar'])->first();
+        return view('pages.produksi.persediaan', compact('title', 'judul', 'products'));
     }
 
     /**
@@ -85,20 +87,74 @@ class ProduksiController extends Controller
         return view('pages.produksi.resep_details', compact('title', 'judul', 'resep', 'reseps'));
     }
 
+    public function produksi_store(Request $request, string $no)
+    {
+        $reseps = Resep::with('produk')->where('no_resep', '=', $no)->get();
+        $totalHargaBaku = 0;
+        $namaProduk = $request->nama_produk;
+        $qtyIn = $request->qty_in;
+        $margin = $request->margin / 100;
+        $biayaTenagaKerja = $request->biaya_pekerja;
+        $biayaOverhead = $request->biaya_overhead;
+
+
+        foreach ($reseps as $resep) {
+            // Pastikan relasi produk tidak kosong
+            if ($resep->produk) {
+                $produk_id = $resep->produk_id;
+                $qty = $resep->qty;
+                $hargaBaku = $resep->produk->harga;
+                $hargaProduksi = $qty * $hargaBaku;
+                $totalHargaBaku += $hargaProduksi;
+                $hpp = $totalHargaBaku + $biayaTenagaKerja + $biayaOverhead;
+                $marginLaba = $hpp * $margin;
+                $hargaJual = $hpp + $marginLaba;
+
+                // Masukkan data ke dalam tabel StokKeluar
+                StokKeluar::create([
+                    'produk_id' => $produk_id,
+                    'stok_keluar' => $qty,
+                    'no_dokumen' => $resep->no_resep,
+                    'keterangan' => 'Bahan Baku Produksi Resep',
+                ]);
+            }
+        }
+
+        $kdProduct = "SLL"  . rand(1000, 9999) . date('dm');
+        ProductSell::create([
+            'no_resep' => $resep->no_resep,
+            'kode_product' => $kdProduct,
+            'nama_product' => $namaProduk,
+            'harga_jual' => $hargaJual,
+            'qty_in' => $qtyIn,
+            'qty_out' => 0,
+        ]);
+
+        return redirect()->route('persediaan')
+            ->with('success', 'Produksi Berhasil Ditambahkan');
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        //
+        $product = ProductSell::findOrFail($id);
+        return response()->json($product);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+
+        $produk = ProductSell::findOrFail($request->id);
+        $produk->nama_product = $request->nama_produk;
+        $produk->qty_in = $request->qty;
+        $produk->save();
+
+        return redirect()->back()->with('success', 'Update Stok Berhasil');
     }
 
     /**

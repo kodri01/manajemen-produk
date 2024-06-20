@@ -21,9 +21,9 @@ class Transaksi extends Model
         'sub_total',
     ];
 
-    public function produk()
+    public function produkSell()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(ProductSell::class, 'produk_id');
     }
 
     public function user()

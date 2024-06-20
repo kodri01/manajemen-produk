@@ -36,7 +36,10 @@ class OrderController extends Controller
             )
             ->groupBy('order_stoks.no_order', 'order_stoks.supplier_id', 'latest_orders.latest_created_at')
             ->get();
-        $produks = Product::with('stokMasuk', 'stokKeluar')->get();
+        // $produks = Product::with('stokMasuk', 'stokKeluar')->get();
+        $getBarangs = Product::with('stokMasuk', 'stokKeluar')->get();
+        $produks = $getBarangs->unique('nama_barang');
+
         $suppliers = Supplier::get();
         return view('pages.product.order', compact('title', 'judul', 'orders', 'produks', 'suppliers'));
     }
@@ -63,8 +66,6 @@ class OrderController extends Controller
         $no_order = "PO" . $date . rand(100000, 999999);
         $harga = $request->harga;
 
-
-
         for ($i = 0; $i < count($nama_barang); $i++) {
             $sub_total = $qty[$i] * $harga[$i];
 
@@ -74,7 +75,7 @@ class OrderController extends Controller
                 'produk_id' => $nama_barang[$i],
                 'satuan' => $satuan[$i],
                 'qty' => $qty[$i],
-                'harga_barang' => $harga[$i],
+                'harga' => $harga[$i],
                 'sub_total' => $sub_total,
 
             ]);
@@ -94,7 +95,7 @@ class OrderController extends Controller
         $judul = "Details PO Barang";
         $total = OrderStok::select(
             DB::raw('SUM(qty) as qty'),
-            DB::raw('SUM(harga_barang) as harga'),
+            DB::raw('SUM(harga) as harga'),
             DB::raw('SUM(sub_total) as total_harga'),
         )->where('no_order', $no)->first();
         $orders = OrderStok::where('no_order', '=', $no)->get();

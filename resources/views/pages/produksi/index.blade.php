@@ -33,6 +33,7 @@
                             <th>No Resep</th>
                             <th>Nama Resep</th>
                             <th>Deskripsi</th>
+                            {{-- <th>Status</th> --}}
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -42,17 +43,32 @@
                             <th>No Resep</th>
                             <th>Nama Resep</th>
                             <th>Deskripsi</th>
+                            {{-- <th>Status</th> --}}
                             <th>Action</th>
                         </tr>
                     </tfoot>
                     <tbody>
                         @foreach ($reseps as $resep)
+                            @php
+                                $no_resep = $resep->no_resep;
+                            @endphp
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $resep->no_resep }}</td>
+                                <td>{{ $no_resep }}</td>
                                 <td>{{ $resep->nama_resep }}</td>
                                 <td>{{ $resep->keterangan }}</td>
-                                <td><a href="{{ route('resep.details', $resep->no_resep) }}"
+                                <td>
+                                    {{-- <form action="{{ route('produksi', $resep->no_resep) }}" method="post"
+                                        class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-sm btn-circle btn-success" type="submit"><i
+                                                class="fas fa-check"></i></button>
+                                    </form> --}}
+                                    <a href="#" class="btn btn-success btn-circle btn-sm" data-toggle="modal"
+                                        data-target="#masukModalEdit" data-id="{{ $resep->no_resep }}">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a href="{{ route('resep.details', $resep->no_resep) }}"
                                         class="btn btn-primary btn-circle btn-sm">
                                         <i class="fas fa-eye"></i>
                                     </a>
@@ -168,23 +184,40 @@
                                     <div class="card-body">
                                         <div class="row">
                                             @foreach ($produks as $produk)
-                                                <div class="col-sm-3">
-                                                    <a href="#" class="btn produk-btn"
-                                                        data-nama-barang="{{ $produk->nama_barang }}"
-                                                        data-satuan="{{ $produk->satuan }}"
-                                                        data-id-barang="{{ $produk->id }}">
-                                                        <div class="card shadow" style="width: 110px;height:160px">
-                                                            <div class="container  d-flex align-items-center justify-content-center"
-                                                                style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
-                                                                <h1 class="m-0 text-bold text-white">
-                                                                    {{ strtoupper(substr($produk->nama_barang, 0, 1)) }}{{ strtoupper(substr($produk->nama_barang, strpos($produk->nama_barang, ' ') + 1, 1)) }}
-                                                                </h1>
+                                                @php
+                                                    $id_produk = $produk->id;
+                                                    $totalStokMasuk = $produk->stokMasuk
+                                                        ->where('produk_id', $id_produk)
+                                                        ->sum('stok_masuk');
+                                                    $totalStokKeluar = $produk->stokKeluar
+                                                        ->where('produk_id', $id_produk)
+                                                        ->sum('stok_keluar');
+                                                    $stok = $totalStokMasuk - $totalStokKeluar;
+                                                @endphp
+                                                @if ($stok == 0)
+                                                    <div></div>
+                                                @else
+                                                    <div class="col-sm-3">
+                                                        <a href="#" class="btn produk-btn"
+                                                            data-nama-barang="{{ $produk->nama_barang }}"
+                                                            data-satuan="{{ $produk->satuan }}"
+                                                            data-id-barang="{{ $produk->id }}">
+                                                            <div class="card shadow" style="width: 110px;height:160px">
+                                                                <div class="container  d-flex align-items-center justify-content-center"
+                                                                    style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
+                                                                    <h1 class="m-0 text-bold text-white">
+                                                                        {{ strtoupper(substr($produk->nama_barang, 0, 1)) }}{{ strtoupper(substr($produk->nama_barang, strpos($produk->nama_barang, ' ') + 1, 1)) }}
+                                                                    </h1>
+                                                                </div>
+                                                                <span for="" class="text-center mt-2"
+                                                                    style="font-size: 12px">{{ $produk->nama_barang }}</span>
+                                                                <span for="" class="text-center"
+                                                                    style="font-size: 12px"><strong>Stok :
+                                                                        {{ $stok }}</strong></span>
                                                             </div>
-                                                            <span for="" class="text-center mt-2"
-                                                                style="font-size: 12px">{{ $produk->nama_barang }}</span>
-                                                        </div>
-                                                    </a>
-                                                </div>
+                                                        </a>
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     </div>
@@ -195,6 +228,92 @@
                 </div>
             </div>
         </div>
+
+        @if ($resep != null)
+            <div class="modal fade" id="masukModalEdit" tabindex="-1" role="dialog"
+                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <form id="editMasukForm" action="{{ route('produksi', $no_resep) }}" method="post">
+                        @csrf
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Produksi Resep</h5>
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                        <div class="form-floating mb-3">
+                                            <input type="text"
+                                                class="form-control @error('nama_produk') is-invalid @enderror"
+                                                id="editMasukInvoice" placeholder="Invoice" name="nama_produk">
+                                            <label for="editMasukInvoice">Nama Produk</label>
+                                        </div>
+                                        @error('nama_produk')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-sm-12 col-md-6 col-lg-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number"
+                                                class="form-control @error('qty_in') is-invalid @enderror"
+                                                id="editMasukJml_masuk" placeholder="name@example.com" name="qty_in">
+                                            <label for="editMasukJml_masuk">Qty Produksi</label>
+                                        </div>
+                                        @error('qty_in')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-sm-12 col-md-6 col-lg-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number"
+                                                class="form-control @error('biaya_pekerja') is-invalid @enderror"
+                                                id="editMasukJml_masuk" placeholder="name@example.com"
+                                                name="biaya_pekerja">
+                                            <label for="editMasukJml_masuk">Biaya Pekerja</label>
+                                        </div>
+                                        @error('biaya_pekerja')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-sm-12 col-md-6 col-lg-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number"
+                                                class="form-control @error('biaya_overhead') is-invalid @enderror"
+                                                id="editMasukJml_masuk" placeholder="name@example.com"
+                                                name="biaya_overhead">
+                                            <label for="editMasukJml_masuk">Biaya Overhead Mesin</label>
+                                        </div>
+                                        @error('biaya_overhead')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-sm-12 col-md-6 col-lg-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number"
+                                                class="form-control @error('margin') is-invalid @enderror"
+                                                id="editMasukJml_masuk" placeholder="name@example.com" name="margin">
+                                            <label for="editMasukJml_masuk">Margin Laba %</label>
+                                        </div>
+                                        @error('margin')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-warning" type="button" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-primary" type="submit">Produksi</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @else
+            <div></div>
+        @endif
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {

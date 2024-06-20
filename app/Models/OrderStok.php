@@ -18,10 +18,8 @@ class OrderStok extends Model
         'no_order',
         'satuan',
         'qty',
-        'harga_barang',
+        'harga',
         'sub_total',
-
-
     ];
 
     public function supplier()

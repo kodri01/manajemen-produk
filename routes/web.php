@@ -69,7 +69,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['middleware' => ['role:administrator|gudang']], function () {
         //Stok Produk
         Route::get('produks', [ProductController::class, 'index'])->name('product');
-        Route::post('produks', [ProductController::class, 'store'])->name('add.product');
+        // Route::post('produks', [ProductController::class, 'store'])->name('add.product');
         Route::get('/produks/{id}/edit', [ProductController::class, 'edit'])->name('edit.product');
         Route::put('/produks', [ProductController::class, 'update'])->name('update.product');
         Route::delete('/produks/delete/{id}', [ProductController::class, 'destroy'])->name('delete.product');
@@ -104,6 +104,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::delete('/resep/delete/{id}', [ProduksiController::class, 'destroy'])->name('resep.delete');
 
         //Persediaan
+        Route::post('/produksi/{no}', [ProduksiController::class, 'produksi_store'])->name('produksi');
         Route::get('persediaan', [ProduksiController::class, 'persediaan'])->name('persediaan');
+        Route::get('/produksi/{id}/edit', [ProduksiController::class, 'edit'])->name('edit.stok');
+        Route::put('/produksi', [ProduksiController::class, 'update'])->name('update.stok');
     });
 });

@@ -148,21 +148,17 @@
                                     <div class="row">
                                         @foreach ($produks as $produk)
                                             @php
-                                                $id_produk = $produk->id;
-                                                $totalStokMasuk = $produk->stokMasuk
-                                                    ->where('produk_id', $id_produk)
-                                                    ->sum('stok_masuk');
-                                                $totalStokKeluar = $produk->stokKeluar
-                                                    ->where('produk_id', $id_produk)
-                                                    ->sum('stok_keluar');
-                                                $stok = $totalStokMasuk - $totalStokKeluar;
+
+                                                $qtyIn = $produk->qty_in;
+                                                $qtyOut = $produk->qty_out;
+                                                $stok = $qtyIn - $qtyOut;
                                                 $sto = intval($stok);
                                             @endphp
                                             @if ($sto == 0)
-                                                <div class="col-sm-3">
-                                                    <a href="#" class="btn produk-btn disabled"
-                                                        data-nama-barang="{{ $produk->nama_barang }}"
-                                                        data-harga="{{ $produk->harga }}"
+                                                <div>
+                                                    {{-- <a href="#" class="btn produk-btn disabled"
+                                                        data-nama-barang="{{ $produk->nama_product }}"
+                                                        data-harga="{{ $produk->harga_jual }}"
                                                         data-id-barang="{{ $produk->id }}">
                                                         <div class="card shadow" style="width: 110px;height:160px">
                                                             <div class="container  d-flex align-items-center justify-content-center"
@@ -172,17 +168,17 @@
                                                                 </h5>
                                                             </div>
                                                             <span for="" class="text-center mt-2"
-                                                                style="font-size: 12px">{{ $produk->nama_barang }}</span>
+                                                                style="font-size: 12px">{{ $produk->nama_product }}</span>
                                                             <span for="" class="text-center"
                                                                 style="font-size: 12px"><strong>{{ $sto }}</strong></span>
                                                         </div>
-                                                    </a>
+                                                    </a> --}}
                                                 </div>
-                                            @elseif($sto >= 10 && $sto <= 30)
+                                            @elseif($sto <= 30)
                                                 <div class="col-sm-3">
                                                     <a href="#" class="btn produk-btn"
-                                                        data-nama-barang="{{ $produk->nama_barang }}"
-                                                        data-harga="{{ $produk->harga }}"
+                                                        data-nama-barang="{{ $produk->nama_product }}"
+                                                        data-harga="{{ $produk->harga_jual }}"
                                                         data-id-barang="{{ $produk->id }}">
                                                         <div class="card shadow" style="width: 110px;height:160px">
                                                             <div class="container  d-flex align-items-center justify-content-center"
@@ -192,29 +188,31 @@
                                                                 </h5>
                                                             </div>
                                                             <span for="" class="text-center mt-2"
-                                                                style="font-size: 12px">{{ $produk->nama_barang }}</span>
+                                                                style="font-size: 12px">{{ $produk->nama_product }}</span>
                                                             <span for="" class="text-center"
-                                                                style="font-size: 12px"><strong>{{ $sto }}</strong></span>
+                                                                style="font-size: 12px"><strong>Stok:
+                                                                    {{ $sto }}</strong></span>
                                                         </div>
                                                     </a>
                                                 </div>
                                             @else
                                                 <div class="col-sm-3">
                                                     <a href="#" class="btn produk-btn"
-                                                        data-nama-barang="{{ $produk->nama_barang }}"
-                                                        data-harga="{{ $produk->harga }}"
+                                                        data-nama-barang="{{ $produk->nama_product }}"
+                                                        data-harga="{{ $produk->harga_jual }}"
                                                         data-id-barang="{{ $produk->id }}">
                                                         <div class="card shadow" style="width: 110px;height:160px">
                                                             <div class="container  d-flex align-items-center justify-content-center"
                                                                 style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
                                                                 <h1 class="m-0 text-bold text-white">
-                                                                    {{ strtoupper(substr($produk->nama_barang, 0, 1)) }}{{ strtoupper(substr($produk->nama_barang, strpos($produk->nama_barang, ' ') + 1, 1)) }}
+                                                                    {{ strtoupper(substr($produk->nama_product, 0, 1)) }}{{ strtoupper(substr($produk->nama_barang, strpos($produk->nama_barang, ' ') + 1, 1)) }}
                                                                 </h1>
                                                             </div>
                                                             <span for="" class="text-center mt-2"
-                                                                style="font-size: 12px">{{ $produk->nama_barang }}</span>
+                                                                style="font-size: 12px">{{ $produk->nama_product }}</span>
                                                             <span for="" class="text-center"
-                                                                style="font-size: 12px"><strong>{{ $sto }}</strong></span>
+                                                                style="font-size: 12px"><strong>Stok:
+                                                                    {{ $sto }}</strong></span>
                                                         </div>
                                                     </a>
                                                 </div>
@@ -318,6 +316,7 @@
                 // Tambahkan elemen-elemen tersebut ke dalam row
                 productRow.appendChild(productNameDiv);
                 productRow.appendChild(hargaDiv);
+                productRow.appendChild(qtyDiv);
                 productRow.appendChild(qtyDiv);
                 productRow.appendChild(priceDiv);
                 productRow.appendChild(deleteButtonDiv);

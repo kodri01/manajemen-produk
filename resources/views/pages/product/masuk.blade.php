@@ -132,24 +132,37 @@
                                     @enderror
                                 </div>
                                 <div class="col-sm-12 col-md-6 col-lg-6">
-                                    <div class="form-floating">
-                                        <select class="form-select form-control @error('produk') is-invalid @enderror"
-                                            id="floatingSelect" aria-label="Floating label select example" name="produk">
-                                            <option selected disabled>Pilih Barang</option>
-                                            @foreach ($produks as $pro)
-                                                <option value="{{ $pro->id }}" class="text-capitalize">
-                                                    {{ $pro->nama_barang }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label for="floatingSelect">Nama Barang</label>
+                                    <div class="form-floating mb-3">
+                                        <input type="text"
+                                            class="form-control @error('nama_barang') is-invalid @enderror"
+                                            id="floatingInput" placeholder="Nama Barang" name="nama_barang">
+                                        <label for="floatingInput">Nama Barang</label>
                                     </div>
-                                    @error('produk')
+                                    @error('nama_barang')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                    <div class="form-floating">
+                                        <select class="form-select form-control @error('satuan') is-invalid @enderror"
+                                            id="floatingSelect" aria-label="Floating label select example" name="satuan">
+                                            <option selected disabled>Pilih Satuan</option>
+                                            <option value="L">Liter</option>
+                                            <option value="KG">KG</option>
+                                            <option value="GR">Gram</option>
+                                            <option value="PCS">PCS</option>
+                                            <option value="UNIT">Unit</option>
+                                        </select>
+                                        <label for="floatingSelect">Satuan</label>
+                                    </div>
+                                    @error('satuan')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-sm-12 col-md-6 col-lg-6">
                                     <div class="form-floating mb-3">
-                                        <input type="text" class="form-control @error('jml_masuk') is-invalid @enderror"
+                                        <input type="text"
+                                            class="form-control @error('jml_masuk') is-invalid @enderror"
                                             id="floatingInput" placeholder="name@example.com" name="jml_masuk">
                                         <label for="floatingInput">Qty</label>
                                     </div>
@@ -157,9 +170,20 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control @error('harga') is-invalid @enderror"
+                                            id="floatingInput" placeholder="Harga" name="harga">
+                                        <label for="floatingInput">Harga</label>
+                                    </div>
+                                    @error('keterangan')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                     <div class="form-floating mb-3">
-                                        <input type="text" class="form-control @error('keterangan') is-invalid @enderror"
+                                        <input type="text"
+                                            class="form-control @error('keterangan') is-invalid @enderror"
                                             id="floatingInput" placeholder="Keterangan" name="keterangan">
                                         <label for="floatingInput">Keterangan</label>
                                     </div>

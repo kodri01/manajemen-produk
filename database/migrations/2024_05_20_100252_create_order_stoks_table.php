@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('no_order');
             $table->string('satuan')->nullable();
             $table->string('qty');
-            $table->string('harga_barang')->nullable();
+            $table->string('harga')->nullable();
             $table->string('sub_total')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -15,9 +15,9 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xl font-weight-bold text-success text-uppercase mb-1">
-                                Total Barang</div>
+                                Total Bahan Baku</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $totalProduk->totalProduk }}
+                                {{ $totalBaku->totalBaku }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -90,7 +90,9 @@
                     $stoks = $totalStokMasuk - $totalStokKeluar;
                     $sto = intval($stoks);
                 @endphp
-                @if ($stoks <= 30)
+                @if ($sto == 0)
+                    <div></div>
+                @else
                     <tr>
                         <td>{{ $stok->nama_barang }}</td>
                         <td>
@@ -100,13 +102,14 @@
                             @if ($sto >= 10 && $sto <= 30)
                                 <span class="badge badge-warning">Stok Menipis
                                 @elseif($sto < 10)
-                                    <span class="badge badge-danger"><b>Stok Habis</b>
+                                    <span class="badge badge-danger"><b>Segera Order Stok</b>
+                                    </span>
+                                @else
+                                    <span class="badge badge-primary"><b>Stok Normal</b>
                                     </span>
                             @endif
                         </td>
-                        <td>
-                            </span> <a href="{{ route('product.order') }}" class="btn btn-sm btn-info">Order</a>
-                        </td>
+
                     </tr>
                 @endif
             @endforeach

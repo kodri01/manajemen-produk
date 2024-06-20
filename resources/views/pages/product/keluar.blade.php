@@ -107,7 +107,8 @@
                                             <option selected disabled>Pilih Barang</option>
                                             @foreach ($produks as $pro)
                                                 <option value="{{ $pro->id }}" class="text-capitalize">
-                                                    {{ $pro->nama_barang }}</option>
+                                                    {{ $pro->kode_barang }} >
+                                                    {{ $pro->nama_barang }} </option>
                                             @endforeach
                                         </select>
                                         <label for="floatingSelect">Nama Barang</label>

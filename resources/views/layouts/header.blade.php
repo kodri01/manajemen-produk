@@ -106,7 +106,7 @@
                         <i class="fas fa-fw fa-receipt"></i>
                         <span>Manage Produksi</span>
                     </a>
-                    <div class="collapse <?php if ($title == 'Produksi - Data Resep' || $title == 'Produksi - Details Resep' || $title == 'Produksi - Persediaan Barang') {
+                    <div class="collapse <?php if ($title == 'Produksi - Data Resep' || $title == 'Produksi - Details Resep' || $title == 'Produksi - Persediaan Produksi') {
                         echo 'show';
                     } ?>" id="collapse1" aria-labelledby="heading1"
                         data-parent="#accordionSidebar">
@@ -114,10 +114,10 @@
                             <a class="collapse-item <?php if ($title == 'Produksi - Data Resep' || $title == 'Produksi - Details Resep') {
                                 echo 'active';
                             } ?>" href="{{ route('resep') }}">Data Resep</a>
-                            <a class="collapse-item <?php if ($title == 'Produksi - Persediaan Barang') {
+                            <a class="collapse-item <?php if ($title == 'Produksi - Persediaan Produksi') {
                                 echo 'active';
                             } ?>" href="{{ route('persediaan') }}">Persedian
-                                Barang</a>
+                                Produksi</a>
 
                         </div>
                     </div>
@@ -169,10 +169,18 @@
             <hr class="sidebar-divider d-none d-md-block">
 
             <!-- Sidebar Toggler (Sidebar) -->
+
+
+
+            <li class="nav-item mb-3">
+                <a class="nav-link " href="{{ route('logout') }}">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    <span>Log Out</span></a>
+            </li>
+
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
-
         </ul>
         <!-- End of Sidebar -->
 
