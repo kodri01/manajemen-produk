@@ -48,27 +48,26 @@
     </div>
     <div class="card shadow mb-3">
         <div class="card-header">
-            <h5 class="mb-2 font-weight-bold text-primary">Informasi Stok</h5>
+            <h5 class="mb-2 font-weight-bold text-primary">Informasi Produk</h5>
         </div>
         <table class="table table-hover">
             <thead>
                 <th>#</th>
+                <th>Tanggal Produksi</th>
                 <th>Nama Barang</th>
                 <th>Sisa Stok</th>
                 <th>Status</th>
             </thead>
             @foreach ($stokpro as $stok)
                 @php
-                    $id_stok = $stok->id;
-                    $totalStokMasuk = $stok->stokMasuk->sum('stok_masuk');
-                    $totalStokKeluar = $stok->stokKeluar->sum('stok_keluar');
-                    $stoks = $totalStokMasuk - $totalStokKeluar;
-                    $sto = intval($stoks);
+                    $qtyIn = $stok->qty_in;
+                    $qtyOut = $stok->qty_out;
+                    $sto = $qtyIn - $qtyOut;
                 @endphp
-
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $stok->nama_barang }}</td>
+                    <td>{{ $stok->created_at }}</td>
+                    <td>{{ $stok->nama_product }}</td>
                     <td>
                         {{ $sto }}
                     </td>
@@ -88,7 +87,7 @@
             @endforeach
             <tfoot>
                 <tr>
-                    <td colspan="4" class="text-center"><a href="{{ route('persediaan') }}" class=""> >> Liat
+                    <td colspan="6" class="text-center"><a href="{{ route('persediaan') }}" class=""> >> Liat
                             Semua Stok</a></td>
                 </tr>
             </tfoot>

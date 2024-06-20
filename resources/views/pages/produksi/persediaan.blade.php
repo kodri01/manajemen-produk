@@ -26,7 +26,7 @@
                             <th>#</th>
                             <th>Kode Produk</th>
                             <th>Nama Produk</th>
-                            <th>Harga</th>
+                            <th>@ Harga</th>
                             <th>Jumlah Produksi</th>
                             <th>Produksi Masuk</th>
                             <th>Produksi Keluar</th>
@@ -38,7 +38,7 @@
                             <th>#</th>
                             <th>Kode Produk</th>
                             <th>Nama Produk</th>
-                            <th>Harga</th>
+                            <th>@ Harga</th>
                             <th>Jumlah Produksi</th>
                             <th>Produksi Masuk</th>
                             <th>Produksi Keluar</th>

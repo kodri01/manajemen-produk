@@ -35,7 +35,7 @@ class DashboardController extends Controller
 
         $supplier = Supplier::select(DB::raw('COUNT(id) as total'))->first();
         $stok = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('created_at', 'desc')->paginate(3);
-        $stokpro = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('created_at', 'desc')->paginate(10);
+        $stokpro = ProductSell::orderBy('created_at', 'desc')->paginate(10);
         $stok_masuk = StokMasuk::with('produk', 'supplier')->orderBy('created_at', 'desc')->paginate(3);
         $stok_keluar = StokKeluar::with('produk')->orderBy('created_at', 'desc')->paginate(3);
         $transaksi = Transaksi::with(['user'])->orderBy('created_at', 'desc')
