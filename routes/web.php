@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BahanBakuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProduksiController;
@@ -64,6 +65,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
         Route::delete('/transaksi/delete/{id}', [TransaksiController::class, 'destroy'])->name('transaksi.delete');
         Route::get('invoice/transaksi/{no}', [InvoiceController::class, 'invoice_transaksi'])->name('invoice.transaksi');
+
+        //laporan
+        Route::get('laporan/neraca', [LaporanController::class, 'index'])->name('lap.neraca');
+        Route::get('laporan/rugi', [LaporanController::class, 'laba_rugi'])->name('lap.laba');
+        Route::get('laporan/modal', [LaporanController::class, 'per_modal'])->name('lap.modal');
     });
 
     Route::group(['middleware' => ['role:administrator|gudang']], function () {

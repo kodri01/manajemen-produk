@@ -163,14 +163,41 @@
                         <i class="fas fa-fw fa-users"></i>
                         <span>Users</span></a>
                 </li>
+
+                <li class="nav-item <?php if ($title == 'Laporan - Neraca' || $title == 'Laporan - Laba Rugi' || $title == 'Laporan - Perubahan Modal') {
+                    echo 'active';
+                } ?>">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse4"
+                        aria-expanded="true" aria-controls="collapse4">
+                        <i class="fas fa-fw fa-receipt"></i>
+                        <span>Laporan</span>
+                    </a>
+                    <div class="collapse <?php if ($title == 'Laporan - Neraca' || $title == 'Laporan - Laba Rugi' || $title == 'Laporan - Perubahan Modal') {
+                        echo 'show';
+                    } ?>" id="collapse4" aria-labelledby="heading1"
+                        data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item <?php if ($title == 'Laporan - Neraca') {
+                                echo 'active';
+                            } ?>" href="{{ route('lap.neraca') }}">Posisi
+                                Keuangan (Neraca)</a>
+                            <a class="collapse-item <?php if ($title == 'Laporan - Laba Rugi') {
+                                echo 'active';
+                            } ?>" href="{{ route('lap.laba') }}">Laba Rugi</a>
+                            <a class="collapse-item <?php if ($title == 'Laporan - Perubahan Modal') {
+                                echo 'active';
+                            } ?>" href="{{ route('lap.modal') }}">Perubahan
+                                Modal</a>
+
+                        </div>
+                    </div>
+                </li>
             @endrole
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
             <!-- Sidebar Toggler (Sidebar) -->
-
-
 
             <li class="nav-item mb-3">
                 <a class="nav-link " href="{{ route('logout') }}">
