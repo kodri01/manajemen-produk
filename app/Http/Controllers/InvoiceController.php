@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OrderStok;
 use App\Models\Resep;
+use App\Models\Setting;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,12 +19,13 @@ class InvoiceController extends Controller
 
         $transaksi = Transaksi::with('user')->where('no_transaksi', '=', $no)->first();
         $transaksis = Transaksi::with('produkSell')->where('no_transaksi', '=', $no)->get();
+        $setting = Setting::first();
 
 
         $total = Transaksi::select(
             DB::raw('SUM(sub_total) as total_harga'),
         )->where('no_transaksi', $no)->first();
-        return view('pages.invoice.transaksi', compact('transaksi', 'transaksis', 'total'));
+        return view('pages.invoice.transaksi', compact('setting', 'transaksi', 'transaksis', 'total'));
     }
 
     /**

@@ -40,9 +40,14 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
                 <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-laugh-wink"></i>
+                    @if ($setting->image == null)
+                        <i class="fas fa-laugh-wink"></i>
+                    @else
+                        <img alt="image" src="{{ asset('uploads/' . $setting->image) }}"
+                            style="width: 50px;height:50px;" class="rounded-circle mr-1">
+                    @endif
                 </div>
-                <div class="sidebar-brand-text mx-3">SERBAGUNA <sup>2</sup></div>
+                <div class="sidebar-brand-text mx-3">{{ $setting->name }}</div>
             </a>
 
             <!-- Divider -->
@@ -191,6 +196,14 @@
 
                         </div>
                     </div>
+                </li>
+
+                <li class="nav-item  <?php if ($title == 'Setting') {
+                    echo 'active';
+                } ?>">
+                    <a class="nav-link" href="{{ route('setting') }}">
+                        <i class="fas fa-fw fa-cog"></i>
+                        <span>Settings</span></a>
                 </li>
             @endrole
 

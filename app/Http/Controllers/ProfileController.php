@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,8 +16,10 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $gender = User::get('gender');
+        $setting = Setting::first();
+
         $title = "Profile - " . $user->name;
-        return view('pages.users.profile', compact('gender', 'user', 'title'));
+        return view('pages.users.profile', compact('setting', 'gender', 'user', 'title'));
     }
 
     /**

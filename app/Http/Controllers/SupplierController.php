@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -15,8 +16,10 @@ class SupplierController extends Controller
     {
         $title = "Supplier - Data Supplier";
         $judul = "Data Supplier";
+        $setting = Setting::first();
+
         $suppliers = Supplier::get();
-        return view('pages.supplier.index', compact('title', 'judul', 'suppliers'));
+        return view('pages.supplier.index', compact('setting', 'title', 'judul', 'suppliers'));
     }
 
     /**

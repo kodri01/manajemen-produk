@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OrderStok;
 use App\Models\Product;
 use App\Models\ProductSell;
+use App\Models\Setting;
 use App\Models\StokMasuk;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ class LaporanController extends Controller
     {
         $title = "Laporan - Neraca";
         $judul = "Laporan Neraca";
+        $setting = Setting::first();
 
         $kas = 0;
         $persediaan = 0;
@@ -75,13 +77,14 @@ class LaporanController extends Controller
 
         $totalKewajiban = $totalUtang + $totalEkuitas;
 
-        return view('pages.laporan.neraca', compact('title', 'judul', 'tahun', 'kas', 'persediaan', 'utangUsaha', 'utangBank', 'totalUtang', 'modal', 'labaRugi', 'totalAktiva', 'totalEkuitas', 'totalKewajiban'));
+        return view('pages.laporan.neraca', compact('setting', 'title', 'judul', 'tahun', 'kas', 'persediaan', 'utangUsaha', 'utangBank', 'totalUtang', 'modal', 'labaRugi', 'totalAktiva', 'totalEkuitas', 'totalKewajiban'));
     }
 
     public function laba_rugi()
     {
         $title = "Laporan - Laba Rugi";
         $judul = "Laporan Laba Rugi";
+        $setting = Setting::first();
 
         $pendapatan = 0;
         $bebanUsaha = 0;
@@ -117,13 +120,14 @@ class LaporanController extends Controller
         $bebanUsaha = $produk->stokMasuk * $produk->harga;
         $labaRugi = $pendapatan - $bebanUsaha;
 
-        return view('pages.laporan.laba_rugi', compact('title', 'judul', 'tahun', 'pendapatan', 'bebanUsaha', 'pajak', 'labaRugi'));
+        return view('pages.laporan.laba_rugi', compact('setting', 'title', 'judul', 'tahun', 'pendapatan', 'bebanUsaha', 'pajak', 'labaRugi'));
     }
 
     public function per_modal()
     {
         $title = "Laporan - Perubahan Modal";
         $judul = "Laporan Perubahan Modal";
+        $setting = Setting::first();
 
         $modalAwal = 0;
         $labaBersih = 0;
@@ -160,7 +164,7 @@ class LaporanController extends Controller
         $total = $labaBersih - $prive;
         $modalAkhir = $modalAwal + $total;
 
-        return view('pages.laporan.perubahan_modal', compact('title', 'judul', 'tahun', 'modalAwal', 'labaBersih', 'prive', 'total', 'modalAkhir'));
+        return view('pages.laporan.perubahan_modal', compact('setting', 'title', 'judul', 'tahun', 'modalAwal', 'labaBersih', 'prive', 'total', 'modalAkhir'));
     }
 
     /**

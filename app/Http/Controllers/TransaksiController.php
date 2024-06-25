@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductSell;
+use App\Models\Setting;
 use App\Models\StokKeluar;
 use App\Models\Transaksi;
 use Carbon\Carbon;
@@ -20,6 +21,8 @@ class TransaksiController extends Controller
     {
         $title = "Transaksi";
         $judul = "Transaksi";
+        $setting = Setting::first();
+
         $produks = ProductSell::orderBy('created_at', 'asc')->get();
 
         $subQuery = Transaksi::select('no_transaksi', DB::raw('MAX(created_at) as latest_created_at'))
@@ -38,7 +41,7 @@ class TransaksiController extends Controller
             ->groupBy('transaksis.no_transaksi',  'latest_transaksis.latest_created_at')
             ->get();
 
-        return view('pages.transaksi.index', compact('title', 'judul', 'produks', 'transaksis'));
+        return view('pages.transaksi.index', compact('setting', 'title', 'judul', 'produks', 'transaksis'));
     }
 
     /**

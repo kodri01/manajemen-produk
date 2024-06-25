@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OrderStok;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class OrderController extends Controller
     {
         $title = "Product - Purchase Order";
         $judul = "Purchase Order (PO) Barang";
+        $setting = Setting::first();
 
         $subQuery = OrderStok::select('no_order', DB::raw('MAX(created_at) as latest_created_at'))
             ->groupBy('no_order');
@@ -41,7 +43,7 @@ class OrderController extends Controller
         $produks = $getBarangs->unique('nama_barang');
 
         $suppliers = Supplier::get();
-        return view('pages.product.order', compact('title', 'judul', 'orders', 'produks', 'suppliers'));
+        return view('pages.product.order', compact('setting', 'title', 'judul', 'orders', 'produks', 'suppliers'));
     }
 
     /**
@@ -93,6 +95,8 @@ class OrderController extends Controller
 
         $title = "Product - Details Order";
         $judul = "Details PO Barang";
+        $setting = Setting::first();
+
         $total = OrderStok::select(
             DB::raw('SUM(qty) as qty'),
             DB::raw('SUM(harga) as harga'),
@@ -100,7 +104,7 @@ class OrderController extends Controller
         )->where('no_order', $no)->first();
         $orders = OrderStok::where('no_order', '=', $no)->get();
         $order = OrderStok::where('no_order', '=', $no)->first();
-        return view('pages.product.order_details', compact('title', 'judul', 'order', 'orders', 'total'));
+        return view('pages.product.order_details', compact('setting', 'title', 'judul', 'order', 'orders', 'total'));
     }
 
     /**

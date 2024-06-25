@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\StokKeluar;
 use App\Models\StokMasuk;
 use App\Models\Supplier;
@@ -19,9 +20,11 @@ class ProductController extends Controller
     {
         $title = "Product - Stok Barang";
         $judul = "Stok Barang";
+        $setting = Setting::first();
+
         $products = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('created_at', 'asc')->get();
         $product = Product::with(['stokMasuk', 'stokKeluar'])->first();
-        return view('pages.product.index', compact('title', 'judul', 'products', 'product'));
+        return view('pages.product.index', compact('setting', 'title', 'judul', 'products', 'product'));
     }
     /**
      * Store a newly created resource in storage.
@@ -124,9 +127,11 @@ class ProductController extends Controller
         $stok_masuk = StokMasuk::with('produk', 'supplier')->orderBy('created_at', 'asc')->get();
         $suppliers = Supplier::get();
         $produks = Product::get();
+        $setting = Setting::first();
+
         $title = "Product - Barang Masuk";
         $judul = "Barang Masuk";
-        return view('pages.product.masuk', compact('title', 'judul', 'stok_masuk', 'suppliers', 'produks'));
+        return view('pages.product.masuk', compact('setting', 'title', 'judul', 'stok_masuk', 'suppliers', 'produks'));
     }
 
     public function masuk_store(Request $request)
@@ -224,9 +229,11 @@ class ProductController extends Controller
     {
         $stok_keluar = StokKeluar::with('produk')->orderBy('created_at', 'desc')->get();
         $produks = Product::get();
+        $setting = Setting::first();
+
         $title = "Product - Barang Keluar";
         $judul = "Barang Keluar";
-        return view('pages.product.keluar', compact('title', 'judul', 'stok_keluar', 'produks'));
+        return view('pages.product.keluar', compact('setting', 'title', 'judul', 'stok_keluar', 'produks'));
     }
 
     public function keluar_store(Request $request)

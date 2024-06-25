@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductSell;
 use App\Models\Resep;
+use App\Models\Setting;
 use App\Models\StokKeluar;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -20,6 +21,8 @@ class ProduksiController extends Controller
     {
         $title = "Produksi - Data Resep";
         $judul = "Data Resep";
+        $setting = Setting::first();
+
         $resep = Resep::first();
         $reseps = Resep::with(['produk'])
             ->select(
@@ -30,7 +33,7 @@ class ProduksiController extends Controller
             ->groupBy('no_resep', 'nama_resep', 'keterangan')
             ->get();
         $produks = Product::get();
-        return view('pages.produksi.index', compact('title', 'judul', 'reseps', 'produks', 'resep'));
+        return view('pages.produksi.index', compact('setting', 'title', 'judul', 'reseps', 'produks', 'resep'));
     }
 
     /**
@@ -40,9 +43,11 @@ class ProduksiController extends Controller
     {
         $title = "Produksi - Persediaan Produksi";
         $judul = "Persediaan Produksi";
+        $setting = Setting::first();
+
         $products = ProductSell::orderBy('created_at', 'asc')->get();
         // $product = ProductSell::with(['stokMasuk', 'stokKeluar'])->first();
-        return view('pages.produksi.persediaan', compact('title', 'judul', 'products'));
+        return view('pages.produksi.persediaan', compact('setting', 'title', 'judul', 'products'));
     }
 
     /**
@@ -82,9 +87,11 @@ class ProduksiController extends Controller
 
         $title = "Produksi - Details Resep";
         $judul = "Details Resep";
+        $setting = Setting::first();
+
         $reseps = Resep::where('no_resep', '=', $no)->get();
         $resep = Resep::where('no_resep', '=', $no)->first();
-        return view('pages.produksi.resep_details', compact('title', 'judul', 'resep', 'reseps'));
+        return view('pages.produksi.resep_details', compact('setting', 'title', 'judul', 'resep', 'reseps'));
     }
 
     public function produksi_store(Request $request, string $no)

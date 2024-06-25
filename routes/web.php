@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProduksiController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\UsersController;
@@ -70,6 +71,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('laporan/neraca', [LaporanController::class, 'index'])->name('lap.neraca');
         Route::get('laporan/rugi', [LaporanController::class, 'laba_rugi'])->name('lap.laba');
         Route::get('laporan/modal', [LaporanController::class, 'per_modal'])->name('lap.modal');
+
+        //setting
+        Route::get('setting', [SettingController::class, 'index'])->name('setting');
+        Route::get('/setting/{id}/edit', [SettingController::class, 'edit'])->name('edit.setting');
+        Route::put('/setting', [SettingController::class, 'store'])->name('update.setting');
     });
 
     Route::group(['middleware' => ['role:administrator|gudang']], function () {

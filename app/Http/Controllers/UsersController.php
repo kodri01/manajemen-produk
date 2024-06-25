@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,9 +26,11 @@ class UsersController extends Controller
     {
         $title = "Data Users";
         $judul = "Data Users";
+        $setting = Setting::first();
+
         $users = User::get();
         $role = Role::get();
-        return view('pages.users.index', compact('title', 'judul', 'role', 'users'));
+        return view('pages.users.index', compact('setting', 'title', 'judul', 'role', 'users'));
     }
 
     /**
