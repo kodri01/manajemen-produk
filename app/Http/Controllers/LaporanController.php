@@ -16,7 +16,7 @@ class LaporanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $title = "Laporan - Neraca";
         $judul = "Laporan Neraca";
@@ -32,15 +32,19 @@ class LaporanController extends Controller
         $labaRugi = 0;
 
 
-        $tahun = StokMasuk::select(DB::raw('YEAR(created_at) as year'))
+        $tahun = Product::select(DB::raw('YEAR(created_at) as year'))
             ->distinct()
             ->pluck('year')
             ->sort()
             ->toArray();
 
+        $selectedYear = $request->input('tahun', reset($tahun));
+
+        // Ambil data transaksi berdasarkan tahun yang dipilih
         $transaksi = Transaksi::select(
             DB::raw('(SELECT SUM(transaksis.sub_total)) AS sell')
         )
+            ->whereYear('created_at', $selectedYear)
             ->whereNull('transaksis.deleted_at')
             ->first();
 
@@ -50,37 +54,48 @@ class LaporanController extends Controller
             ->whereNull('order_stoks.deleted_at')
             ->first();
 
-        $produk = Product::with(['stokMasuk', 'stokKeluar'])
-            ->leftJoin('stok_masuks', 'products.id', '=', 'stok_masuks.produk_id')
-            ->leftJoin('stok_keluars', 'products.id', '=', 'stok_keluars.produk_id')
-            ->selectRaw(
-                '
-        products.harga as harga, 
-        stok_masuks.stok_masuk as stokMasuk, 
-        SUM(stok_keluars.stok_keluar) as stokKeluar
-        '
-            )
-            ->whereNull('products.deleted_at')
-            ->groupBy('products.id', 'stokMasuk', 'harga')
-            ->first();
+        $produkSell = ProductSell::whereYear('created_at', $selectedYear)->sum(DB::raw('harga_jual * qty_in '));
+        // $produkSell = ProductSell::whereYear('created_at', $selectedYear)->sum(DB::raw('harga_jual * (qty_in - qty_out)'));
+        $produkModal = ProductSell::whereYear('created_at', $selectedYear)->sum(DB::raw('harga_jual * qty_in'));
+        $produkHarga = ProductSell::whereYear('created_at', $selectedYear)->sum(DB::raw('harga_jual'));
 
 
-        $kas = $transaksi->sell - $po->po;
-        $persediaan = $po->po;
+        $hargaProduk = Product::join('stok_masuks', 'products.id', '=', 'stok_masuks.produk_id')
+            ->whereYear('stok_masuks.created_at', $selectedYear) // Filter berdasarkan tahun
+            ->sum(DB::raw('products.harga * stok_masuks.stok_masuk'));
+
+        if ($produkSell != null) {
+            $modal = $produkModal;
+            $persediaan = $produkSell;
+        } else {
+            $modal = 0;
+            $persediaan = 0;
+        }
+
+        if ($transaksi != null) {
+            $kas = $transaksi->sell - $produkHarga;
+            $labaRugi = $transaksi->sell - $produkHarga;
+        } else {
+            $kas = 0;
+        }
+
+
+        if ($tahun != null) {
+            $tahun;
+        } else {
+            $tahun[] = 2024;
+        }
+
         $totalAktiva = $kas + $persediaan;
-
         $totalUtang = $utangBank + $utangUsaha;
-
-        $modal = $produk->stokMasuk * $produk->harga;
-        $labaRugi = $transaksi->sell - $modal;
         $totalEkuitas = $modal + $labaRugi;
 
         $totalKewajiban = $totalUtang + $totalEkuitas;
 
-        return view('pages.laporan.neraca', compact('setting', 'title', 'judul', 'tahun', 'kas', 'persediaan', 'utangUsaha', 'utangBank', 'totalUtang', 'modal', 'labaRugi', 'totalAktiva', 'totalEkuitas', 'totalKewajiban'));
+        return view('pages.laporan.neraca', compact('setting', 'title', 'judul', 'tahun', 'kas', 'persediaan', 'utangUsaha', 'utangBank', 'totalUtang', 'modal', 'labaRugi', 'totalAktiva', 'totalEkuitas', 'totalKewajiban', 'selectedYear'));
     }
 
-    public function laba_rugi()
+    public function laba_rugi(Request $request)
     {
         $title = "Laporan - Laba Rugi";
         $judul = "Laporan Laba Rugi";
@@ -90,40 +105,49 @@ class LaporanController extends Controller
         $bebanUsaha = 0;
         $pajak = 0;
 
-        $tahun = StokMasuk::select(DB::raw('YEAR(created_at) as year'))
+        $tahun = Product::select(DB::raw('YEAR(created_at) as year'))
             ->distinct()
             ->pluck('year')
             ->sort()
             ->toArray();
 
+        $selectedYear = $request->input('tahun', reset($tahun));
+
+        // Ambil data transaksi berdasarkan tahun yang dipilih
         $transaksi = Transaksi::select(
             DB::raw('(SELECT SUM(transaksis.sub_total)) AS sell')
         )
+            ->whereYear('created_at', $selectedYear)
             ->whereNull('transaksis.deleted_at')
             ->first();
 
-        $produk = Product::with(['stokMasuk', 'stokKeluar'])
-            ->leftJoin('stok_masuks', 'products.id', '=', 'stok_masuks.produk_id')
-            ->leftJoin('stok_keluars', 'products.id', '=', 'stok_keluars.produk_id')
-            ->selectRaw(
-                '
-        products.harga as harga, 
-        stok_masuks.stok_masuk as stokMasuk, 
-        SUM(stok_keluars.stok_keluar) as stokKeluar
-        '
-            )
-            ->whereNull('products.deleted_at')
-            ->groupBy('products.id', 'stokMasuk', 'harga')
-            ->first();
+        $produkSell = ProductSell::whereYear('created_at', $selectedYear)->sum(DB::raw('harga_jual'));
+
+
+        $hargaProduk = Product::join('stok_masuks', 'products.id', '=', 'stok_masuks.produk_id')
+            ->whereYear('stok_masuks.created_at', $selectedYear) // Filter berdasarkan tahun
+            ->sum(DB::raw('products.harga * stok_masuks.stok_masuk'));
+
+
+        if ($produkSell != null) {
+            $bebanUsaha = $produkSell;
+        } else {
+            $bebanUsaha = 0;
+        }
+
+        if ($tahun != null) {
+            $tahun;
+        } else {
+            $tahun[] = 2024;
+        }
 
         $pendapatan = $transaksi->sell;
-        $bebanUsaha = $produk->stokMasuk * $produk->harga;
         $labaRugi = $pendapatan - $bebanUsaha;
 
-        return view('pages.laporan.laba_rugi', compact('setting', 'title', 'judul', 'tahun', 'pendapatan', 'bebanUsaha', 'pajak', 'labaRugi'));
+        return view('pages.laporan.laba_rugi', compact('setting', 'title', 'judul', 'tahun', 'pendapatan', 'bebanUsaha', 'pajak', 'labaRugi', 'selectedYear'));
     }
 
-    public function per_modal()
+    public function per_modal(Request $request)
     {
         $title = "Laporan - Perubahan Modal";
         $judul = "Laporan Perubahan Modal";
@@ -133,38 +157,47 @@ class LaporanController extends Controller
         $labaBersih = 0;
         $prive = 0;
 
-        $tahun = StokMasuk::select(DB::raw('YEAR(created_at) as year'))
+        $tahun = Product::select(DB::raw('YEAR(created_at) as year'))
             ->distinct()
             ->pluck('year')
             ->sort()
             ->toArray();
 
+        $selectedYear = $request->input('tahun', reset($tahun));
+
+        // Ambil data transaksi berdasarkan tahun yang dipilih
         $transaksi = Transaksi::select(
             DB::raw('(SELECT SUM(transaksis.sub_total)) AS sell')
         )
+            ->whereYear('created_at', $selectedYear)
             ->whereNull('transaksis.deleted_at')
             ->first();
 
-        $produk = Product::with(['stokMasuk', 'stokKeluar'])
-            ->leftJoin('stok_masuks', 'products.id', '=', 'stok_masuks.produk_id')
-            ->leftJoin('stok_keluars', 'products.id', '=', 'stok_keluars.produk_id')
-            ->selectRaw(
-                '
-            products.harga as harga, 
-            stok_masuks.stok_masuk as stokMasuk, 
-            SUM(stok_keluars.stok_keluar) as stokKeluar
-            '
-            )
-            ->whereNull('products.deleted_at')
-            ->groupBy('products.id', 'stokMasuk', 'harga')
-            ->first();
+        $produkModal = ProductSell::whereYear('created_at', $selectedYear)->sum(DB::raw('harga_jual * qty_in'));
+        $produkSell = ProductSell::whereYear('created_at', $selectedYear)->sum(DB::raw('harga_jual'));
 
-        $modalAwal = $produk->stokMasuk * $produk->harga;
-        $labaBersih = $transaksi->sell - ($produk->stokMasuk * $produk->harga);
+
+        if ($produkSell != null) {
+            $labaBersih = $transaksi->sell - $produkSell;
+        } else {
+            $labaBersih = 0;
+        }
+
+        if ($produkModal != null) {
+            $modalAwal = $produkModal;
+        } else {
+            $modalAwal = 0;
+        }
+
+        if ($tahun != null) {
+            $tahun;
+        } else {
+            $tahun[] = 2024;
+        }
         $total = $labaBersih - $prive;
         $modalAkhir = $modalAwal + $total;
 
-        return view('pages.laporan.perubahan_modal', compact('setting', 'title', 'judul', 'tahun', 'modalAwal', 'labaBersih', 'prive', 'total', 'modalAkhir'));
+        return view('pages.laporan.perubahan_modal', compact('setting', 'title', 'judul', 'tahun', 'modalAwal', 'labaBersih', 'prive', 'total', 'modalAkhir', 'selectedYear'));
     }
 
     /**

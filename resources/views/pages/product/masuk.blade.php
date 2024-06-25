@@ -131,6 +131,7 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+
                                 <div class="col-sm-12 col-md-6 col-lg-6">
                                     <div class="form-floating mb-3">
                                         <input type="text"

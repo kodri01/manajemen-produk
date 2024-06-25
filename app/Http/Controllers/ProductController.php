@@ -127,6 +127,7 @@ class ProductController extends Controller
         $stok_masuk = StokMasuk::with('produk', 'supplier')->orderBy('created_at', 'asc')->get();
         $suppliers = Supplier::get();
         $produks = Product::get();
+        // dd($produks);
         $setting = Setting::first();
 
         $title = "Product - Barang Masuk";
@@ -159,13 +160,24 @@ class ProductController extends Controller
 
         $kdBarang = "PRD" . $request->satuan . rand(1000, 9999) . date('dm');
 
-        $produk = Product::create([
-            'kode_barang' => $kdBarang,
-            'nama_barang' => $request->nama_barang,
-            'satuan' => $request->satuan,
-            'harga' => $request->harga,
-        ]);
+        // Cek apakah nama produk sudah ada di database dengan penulisan huruf yang berbeda
+        $existingProduct = Product::whereRaw('LOWER(nama_barang) = ?', [strtolower($request->nama_barang)])->first();
+        // dd($existingProduct);
 
+        if (!$existingProduct) {
+            // Jika produk dengan nama yang sama belum ada, simpan produk baru
+            $produk = Product::create([
+                'kode_barang' => $kdBarang,
+                'nama_barang' => $request->nama_barang,
+                'satuan' => $request->satuan,
+                'harga' => $request->harga,
+            ]);
+        } else {
+            // Jika produk dengan nama yang sama sudah ada, gunakan produk yang ada
+            $produk = $existingProduct;
+        }
+
+        // Lanjutkan ke kode berikutnya
         StokMasuk::create([
             'produk_id' => $produk->id,
             'supplier_id' => $request->supplier,
@@ -173,6 +185,7 @@ class ProductController extends Controller
             'stok_masuk' => $request->jml_masuk,
             'keterangan' => $request->keterangan,
         ]);
+
 
         return redirect()->route('product.masuk')
             ->with('success', 'Data Berhasil ditambahkan');

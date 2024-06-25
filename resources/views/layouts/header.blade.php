@@ -39,12 +39,12 @@
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
-                <div class="sidebar-brand-icon rotate-n-15">
+                <div class="sidebar-brand-icon ">
                     @if ($setting->image == null)
                         <i class="fas fa-laugh-wink"></i>
                     @else
                         <img alt="image" src="{{ asset('uploads/' . $setting->image) }}"
-                            style="width: 50px;height:50px;" class="rounded-circle mr-1">
+                            style="width: 50px;height:50px;" class="rounded-circle">
                     @endif
                 </div>
                 <div class="sidebar-brand-text mx-3">{{ $setting->name }}</div>
