@@ -58,8 +58,6 @@ class Product extends Model
             $product->stokMasuk()->delete();
             $product->stokKeluar()->delete();
             $product->order()->delete();
-            $product->resep()->delete();
-            $product->transaksi()->delete();
         });
     }
 }

@@ -20,8 +20,18 @@
     <div class="wrapper-table bg-white rounded ">
         <div class="card shadow ">
             <div class="card-header">
-                <h6 class="m-0 font-weight-bold"><a href="#" data-toggle="modal" data-target="#resepModal"
+                <h6 class="mb-2 font-weight-bold"><a href="#" data-toggle="modal" data-target="#resepModal"
                         class="btn btn-primary ">+ Data Resep</a></h6>
+                @if (Session::has('success'))
+                    <div class="alert alert-success">
+                        {{ Session::get('success') }}
+                    </div>
+                @endif
+                @if (Session::has('error'))
+                    <div class="alert alert-danger">
+                        {{ Session::get('error') }}
+                    </div>
+                @endif
             </div>
         </div>
         <div class="card-body" id="tableStok">
@@ -105,7 +115,6 @@
                                 <form id="formResep" action="{{ route('add.resep') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
-                                    {{-- <div class="col-md-12 "> --}}
                                     <div class="row mt-2 mb-4">
                                         <div class="col-sm-6">
                                             <label for="inputState" class="form-label font-weight-bold text-primary">Nama
@@ -122,8 +131,7 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <label for="inputState"
-                                                class="form-label font-weight-bold text-primary">Deskripsi
-                                                Resep</label>
+                                                class="form-label font-weight-bold text-primary">Deskripsi Resep</label>
                                             <div class="form-floating">
                                                 <input type="text"
                                                     class="form-control @error('keterangan') is-invalid @enderror"
@@ -135,9 +143,7 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    {{-- </div> --}}
                                     <div class="card shadow mb-4">
-                                        <!-- Card Header - Accordion -->
                                         <div href="#" class="d-block card-header py-3">
                                             <div class="row ">
                                                 <div class="col-sm-5">
@@ -151,19 +157,17 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- Card Content - Collapse -->
                                         <div class="collapse show" id="collapseCardExample">
                                             <div class="card-body">
                                                 <div id="selectedProductsContainer">
                                                 </div>
-
+                                                <div id="error-message" class="text-danger"></div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="content" class="font-weight-bold text-primary">Instruksi</label>
                                         <textarea id="summernote" name="instruksi" class="form-control" rows="10" cols="50"></textarea>
-
                                     </div>
                                     <div class="row g-2">
                                         <div class="col-sm-6">
@@ -171,7 +175,8 @@
                                                 data-dismiss="modal">Cancel</button>
                                         </div>
                                         <div class="col-sm-6">
-                                            <button type="submit" class="btn btn-primary w-100">Simpan</button>
+                                            <button type="submit" class="btn btn-primary w-100"
+                                                id="submitForm">Simpan</button>
                                         </div>
                                     </div>
                                 </form>
@@ -201,9 +206,10 @@
                                                         <a href="#" class="btn produk-btn"
                                                             data-nama-barang="{{ $produk->nama_barang }}"
                                                             data-satuan="{{ $produk->satuan }}"
+                                                            data-stok="{{ $stok }}"
                                                             data-id-barang="{{ $produk->id }}">
                                                             <div class="card shadow" style="width: 110px;height:160px">
-                                                                <div class="container  d-flex align-items-center justify-content-center"
+                                                                <div class="container d-flex align-items-center justify-content-center"
                                                                     style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
                                                                     <h1 class="m-0 text-bold text-white">
                                                                         {{ strtoupper(substr($produk->nama_barang, 0, 1)) }}{{ strtoupper(substr($produk->nama_barang, strpos($produk->nama_barang, ' ') + 1, 1)) }}
@@ -233,9 +239,10 @@
             <div class="modal fade" id="masukModalEdit" tabindex="-1" role="dialog"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
-                    <form id="editMasukForm" action="{{ route('produksi', $no_resep) }}" method="post">
+                    <form id="editMasukForm" action="" method="post">
                         @csrf
                         <div class="modal-content">
+                            <input type="hidden" name="no_resep" id="noResep" value="">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel">Produksi Resep</h5>
                                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
@@ -316,6 +323,15 @@
         @endif
 
         <script>
+            $('#masukModalEdit').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget); // Tombol yang diklik
+                var noResep = button.data('id'); // Ambil data-id
+
+                var modal = $(this);
+                modal.find('.modal-body #noResep').val(noResep);
+                modal.find('form').attr('action', '/produksi/' + noResep);
+            });
+
             document.addEventListener('DOMContentLoaded', function() {
                 var productButtons = document.querySelectorAll('.produk-btn');
                 var selectedProductsContainer = document.getElementById('selectedProductsContainer');
@@ -324,26 +340,29 @@
                     button.addEventListener('click', function(event) {
                         event.preventDefault();
                         var productName = this.getAttribute('data-nama-barang');
+                        var satuan = this.getAttribute('data-satuan');
+                        var stokTersedia = parseInt(this.getAttribute('data-stok'));
+                        var idBarang = this.getAttribute('data-id-barang');
                         var existingProductRow = document.querySelector(
                             `[data-product-name="${productName}"]`);
 
                         if (existingProductRow) {
-                            // Jika produk sudah ada, tambahkan quantity
                             var qtyInput = existingProductRow.querySelector('.qty-input');
-                            var currentQty = parseInt(qtyInput.value);
-                            qtyInput.value = currentQty + 1;
+                            var newQty = parseInt(qtyInput.value) + 1;
+
+                            if (newQty > stokTersedia) {
+                                alert('Stok tidak mencukupi!');
+                                return;
+                            }
+
+                            qtyInput.value = newQty;
                         } else {
-                            // Jika produk belum ada, tambahkan row baru
-                            var satuan = this.getAttribute('data-satuan');
-                            var harga = this.getAttribute('data-harga');
-                            var idBarang = this.getAttribute('data-id-barang');
-                            addProductRow(productName, satuan, harga, idBarang);
+                            addProductRow(productName, satuan, stokTersedia, idBarang);
                         }
-                        updateTotal();
                     });
                 });
 
-                function addProductRow(productName, satuan, harga, idBarang) {
+                function addProductRow(productName, satuan, stokTersedia, idBarang) {
                     var productRow = document.createElement('div');
                     productRow.className = 'row mb-2';
                     productRow.setAttribute('data-product-name', productName);
@@ -359,7 +378,7 @@
                     var qtyDiv = document.createElement('div');
                     qtyDiv.className = 'col-sm-3';
                     qtyDiv.innerHTML =
-                        '<input type="number" class="form-control qty-input" name="qty[]" value="1" min="1" onchange="updateTotal()">';
+                        `<input type="number" class="form-control qty-input" name="qty[]" value="1" min="1" max="${stokTersedia}" data-stok="${stokTersedia}">`;
 
                     var deleteButtonDiv = document.createElement('div');
                     deleteButtonDiv.className = 'col-sm-2';
@@ -368,7 +387,6 @@
                     deleteButtonDiv.addEventListener('click', function(event) {
                         event.preventDefault();
                         selectedProductsContainer.removeChild(productRow);
-                        updateTotal();
                     });
 
                     var hiddenProductNameInput = document.createElement('input');
@@ -376,7 +394,6 @@
                     hiddenProductNameInput.name = 'nama_barang[]';
                     hiddenProductNameInput.value = idBarang;
 
-                    // Append all elements to the product row
                     productRow.appendChild(productNameDiv);
                     productRow.appendChild(satuanDiv);
                     productRow.appendChild(qtyDiv);
@@ -384,8 +401,24 @@
                     productRow.appendChild(hiddenProductNameInput);
 
                     selectedProductsContainer.appendChild(productRow);
-                }
 
+                    // Tambahkan event listener untuk validasi kuantitas
+                    selectedProductsContainer.addEventListener('input', function(event) {
+                        if (event.target.classList.contains('qty-input')) {
+                            var qtyInput = event.target;
+                            var productRow = qtyInput.closest('.row');
+                            var stokTersedia = parseInt(qtyInput.getAttribute('data-stok'));
+
+                            if (parseInt(qtyInput.value) > stokTersedia) {
+                                alert('Stok tidak mencukupi!');
+                                qtyInput.value = stokTersedia;
+                            }
+                        }
+                    });
+
+
+
+                }
             });
         </script>
 

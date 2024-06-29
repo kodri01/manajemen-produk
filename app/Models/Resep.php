@@ -27,4 +27,9 @@ class Resep extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function produkSell()
+    {
+        return $this->hasMany(ProductSell::class, 'no_resep');
+    }
 }

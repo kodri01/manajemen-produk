@@ -7,6 +7,7 @@ use App\Models\ProductSell;
 use App\Models\Resep;
 use App\Models\Setting;
 use App\Models\StokKeluar;
+use App\Models\StokMasuk;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +30,7 @@ class ProduksiController extends Controller
                 'no_resep',
                 'nama_resep',
                 'keterangan',
-            )
+            )->orderBy('created_at', 'desc')
             ->groupBy('no_resep', 'nama_resep', 'keterangan')
             ->get();
         $produks = Product::get();
@@ -45,7 +46,7 @@ class ProduksiController extends Controller
         $judul = "Persediaan Produksi";
         $setting = Setting::first();
 
-        $products = ProductSell::orderBy('created_at', 'asc')->get();
+        $products = ProductSell::orderBy('created_at', 'desc')->get();
         // $product = ProductSell::with(['stokMasuk', 'stokKeluar'])->first();
         return view('pages.produksi.persediaan', compact('setting', 'title', 'judul', 'products'));
     }
@@ -96,7 +97,8 @@ class ProduksiController extends Controller
 
     public function produksi_store(Request $request, string $no)
     {
-        $reseps = Resep::with('produk')->where('no_resep', '=', $no)->get();
+        $noResep = $no; // Ambil no dari parameter URL
+        $reseps = Resep::with('produk')->where('no_resep', '=', $noResep)->get();
         $totalHargaBaku = 0;
         $namaProduk = $request->nama_produk;
         $qtyIn = $request->qty_in;
@@ -104,9 +106,7 @@ class ProduksiController extends Controller
         $biayaTenagaKerja = $request->biaya_pekerja;
         $biayaOverhead = $request->biaya_overhead;
 
-
         foreach ($reseps as $resep) {
-            // Pastikan relasi produk tidak kosong
             if ($resep->produk) {
                 $produk_id = $resep->produk_id;
                 $qty = $resep->qty;
@@ -117,7 +117,6 @@ class ProduksiController extends Controller
                 $marginLaba = $hpp * $margin;
                 $hargaJual = $hpp + $marginLaba;
 
-                // Masukkan data ke dalam tabel StokKeluar
                 StokKeluar::create([
                     'produk_id' => $produk_id,
                     'stok_keluar' => $qty,
@@ -127,7 +126,7 @@ class ProduksiController extends Controller
             }
         }
 
-        $kdProduct = "SLL"  . rand(1000, 9999) . date('dm');
+        $kdProduct = "SLL" . rand(1000, 9999) . date('dm');
         ProductSell::create([
             'no_resep' => $resep->no_resep,
             'kode_product' => $kdProduct,
@@ -169,7 +168,33 @@ class ProduksiController extends Controller
      */
     public function destroy(string $no_resep)
     {
+
+        $reseps = Resep::where('no_resep', $no_resep)->get();
+
+        foreach ($reseps as $resep) {
+            if ($resep->produk) {
+                $produk_id = $resep->produk_id;
+                $qty = $resep->qty;
+
+                // Kurangi stok pada tabel StokKeluar
+                $stokKeluar = StokKeluar::where('produk_id', $produk_id)
+                    ->where('no_dokumen', $resep->no_resep)
+                    ->first();
+                if ($stokKeluar) {
+                    $stokKeluar->stok_keluar -= $qty;
+                    if ($stokKeluar->stok_keluar <= 0) {
+                        $stokKeluar->delete();
+                    } else {
+                        $stokKeluar->save();
+                    }
+                }
+            }
+        }
+
+        ProductSell::where('no_resep', $no_resep)->delete();
+        // Hapus resep
         Resep::where('no_resep', $no_resep)->delete();
+
         return redirect()->back()->with('error', 'Data Resep Berhasil dihapus');
     }
 }

@@ -68,7 +68,7 @@ class TransaksiController extends Controller
         for ($i = 0; $i < count($nama_barang); $i++) {
             $transaksi = Transaksi::create([
                 'user_id' => Auth::user()->id,
-                'produk_id' => $nama_barang[$i],
+                'produk_sell_id' => $nama_barang[$i],
                 'no_transaksi' => $no_transaksi,
                 'harga_barang' => $harga[$i],
                 'qty' => $qty[$i],
@@ -116,6 +116,25 @@ class TransaksiController extends Controller
      */
     public function destroy(string $no_transaksi)
     {
+        $transaksis = Transaksi::where('no_transaksi', $no_transaksi)->get();
+
+        foreach ($transaksis as $transaksi) {
+            $produk_sell_id = $transaksi->produk_sell_id;
+            $qty = $transaksi->qty;
+
+            // Update ProductSell untuk mengembalikan qty_in dan qty_out
+            $productSell = ProductSell::where('id', $produk_sell_id)->first();
+            if ($productSell) {
+                $productSell->qty_out -= $qty;
+
+                // Pastikan nilai qty_out tidak negatif
+                if ($productSell->qty_out < 0) {
+                    $productSell->qty_out = 0;
+                }
+                $productSell->save();
+            }
+        }
+
         Transaksi::where('no_transaksi', $no_transaksi)->delete();
         return redirect()->back()->with('error', 'Data Transaksi Berhasil dihapus');
     }

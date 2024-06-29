@@ -148,38 +148,20 @@
                                     <div class="row">
                                         @foreach ($produks as $produk)
                                             @php
-
                                                 $qtyIn = $produk->qty_in;
                                                 $qtyOut = $produk->qty_out;
                                                 $stok = $qtyIn - $qtyOut;
                                                 $sto = intval($stok);
                                             @endphp
                                             @if ($sto == 0)
-                                                <div>
-                                                    {{-- <a href="#" class="btn produk-btn disabled"
-                                                        data-nama-barang="{{ $produk->nama_product }}"
-                                                        data-harga="{{ $produk->harga_jual }}"
-                                                        data-id-barang="{{ $produk->id }}">
-                                                        <div class="card shadow" style="width: 110px;height:160px">
-                                                            <div class="container  d-flex align-items-center justify-content-center"
-                                                                style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
-                                                                <h5 class="m-0 text-bold text-white">
-                                                                    <span class="badge badge-danger">No Stok</span>
-                                                                </h5>
-                                                            </div>
-                                                            <span for="" class="text-center mt-2"
-                                                                style="font-size: 12px">{{ $produk->nama_product }}</span>
-                                                            <span for="" class="text-center"
-                                                                style="font-size: 12px"><strong>{{ $sto }}</strong></span>
-                                                        </div>
-                                                    </a> --}}
-                                                </div>
+                                                <div class=""></div>
                                             @elseif($sto <= 30)
                                                 <div class="col-sm-3">
                                                     <a href="#" class="btn produk-btn"
                                                         data-nama-barang="{{ $produk->nama_product }}"
                                                         data-harga="{{ $produk->harga_jual }}"
-                                                        data-id-barang="{{ $produk->id }}">
+                                                        data-id-barang="{{ $produk->id }}"
+                                                        data-stok="{{ $sto }}">
                                                         <div class="card shadow" style="width: 110px;height:160px">
                                                             <div class="container  d-flex align-items-center justify-content-center"
                                                                 style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
@@ -200,7 +182,8 @@
                                                     <a href="#" class="btn produk-btn"
                                                         data-nama-barang="{{ $produk->nama_product }}"
                                                         data-harga="{{ $produk->harga_jual }}"
-                                                        data-id-barang="{{ $produk->id }}">
+                                                        data-id-barang="{{ $produk->id }}"
+                                                        data-stok="{{ $sto }}">
                                                         <div class="card shadow" style="width: 110px;height:160px">
                                                             <div class="container  d-flex align-items-center justify-content-center"
                                                                 style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
@@ -240,30 +223,30 @@
                     var productName = this.getAttribute('data-nama-barang');
                     var productPrice = parseFloat(this.getAttribute('data-harga'));
                     var idBarang = this.getAttribute('data-id-barang');
+                    var stokTersedia = parseInt(this.getAttribute('data-stok'));
                     var existingProductRow = document.querySelector(
                         `[data-product-name="${productName}"]`);
 
                     if (existingProductRow) {
                         // Jika produk sudah ada, tambahkan quantity
                         var qtyInput = existingProductRow.querySelector('.qty-input');
-                        qtyInput.value = parseInt(qtyInput.value) + 1;
+                        var newQty = parseInt(qtyInput.value) + 1;
 
-                        // Update total price for the product
-                        var totalPriceLabel = existingProductRow.querySelector(
-                            '.total-price-label');
-                        totalPriceLabel.textContent = 'Rp ' + (qtyInput.value * productPrice)
-                            .toFixed(0);
+                        if (newQty > stokTersedia) {
+                            alert('Stok tidak mencukupi!');
+                            return;
+                        }
 
-                        var hiddenPrice = existingProductRow.querySelector('.hidden-price');
-                        hiddenPrice.value = (qtyInput.value * productPrice).toFixed(0);
+                        qtyInput.value = newQty;
+                        updateProductTotal(existingProductRow, productPrice);
                     } else {
-                        addProductRow(productName, productPrice, idBarang);
+                        addProductRow(productName, productPrice, idBarang, stokTersedia);
                     }
                     updateTotal();
                 });
             });
 
-            function addProductRow(productName, productPrice, idBarang) {
+            function addProductRow(productName, productPrice, idBarang, stokTersedia) {
                 // Jika produk belum ada, tambahkan row baru
                 var productRow = document.createElement('div');
                 productRow.className = 'row mb-2';
@@ -280,7 +263,8 @@
                 var qtyDiv = document.createElement('div');
                 qtyDiv.className = 'col-sm-2';
                 qtyDiv.innerHTML =
-                    '<input type="number" class="qty-input w-100" name="qty[]" value="1" min="1" data-price="' +
+                    '<input type="number" class="qty-input w-100" name="qty[]" value="1" min="1" max="' +
+                    stokTersedia + '" data-price="' +
                     productPrice + '">';
 
                 var priceDiv = document.createElement('div');
@@ -317,7 +301,6 @@
                 productRow.appendChild(productNameDiv);
                 productRow.appendChild(hargaDiv);
                 productRow.appendChild(qtyDiv);
-                productRow.appendChild(qtyDiv);
                 productRow.appendChild(priceDiv);
                 productRow.appendChild(deleteButtonDiv);
                 productRow.appendChild(hiddenProductNameInput);
@@ -333,16 +316,26 @@
                     var qtyInput = event.target;
                     var productRow = qtyInput.closest('.row');
                     var productPrice = parseFloat(qtyInput.getAttribute('data-price'));
-                    var totalPriceLabel = productRow.querySelector('.total-price-label');
-                    totalPriceLabel.textContent = 'Rp ' + (qtyInput.value * productPrice).toFixed(0);
+                    var stokTersedia = parseInt(qtyInput.getAttribute('max'));
 
-                    // Update hidden input value
-                    var hiddenPrice = productRow.querySelector('.hidden-price');
-                    hiddenPrice.value = (qtyInput.value * productPrice).toFixed(0);
+                    if (parseInt(qtyInput.value) > stokTersedia) {
+                        alert('Stok tidak mencukupi!');
+                        qtyInput.value = stokTersedia;
+                    }
 
-                    updateTotal(); // Update total after changing quantity
+                    updateProductTotal(productRow, productPrice);
                 }
             });
+
+            function updateProductTotal(productRow, productPrice) {
+                var qtyInput = productRow.querySelector('.qty-input');
+                var totalPriceLabel = productRow.querySelector('.total-price-label');
+                totalPriceLabel.textContent = 'Rp ' + (qtyInput.value * productPrice).toFixed(0);
+
+                // Update hidden input value
+                var hiddenPrice = productRow.querySelector('.hidden-price');
+                hiddenPrice.value = (qtyInput.value * productPrice).toFixed(0);
+            }
 
             function updateTotal() {
                 var qtyInputs = selectedProductsContainer.querySelectorAll('.qty-input');
