@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reseps', function (Blueprint $table) {
+        Schema::create('masters', function (Blueprint $table) {
             $table->id();
-            $table->string('baku_id');
-            $table->string('produk_id');
-            $table->string('no_resep');
-            $table->string('qty');
-            $table->string('nama_resep');
-            $table->string('keterangan');
-            $table->string('instruksi');
+            $table->string('name');
+            $table->string('kategori');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reseps');
+        Schema::dropIfExists('masters');
     }
 };

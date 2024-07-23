@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Laporan;
 use App\Models\OrderStok;
 use App\Models\Product;
 use App\Models\Setting;
@@ -38,9 +39,18 @@ class OrderController extends Controller
             )
             ->groupBy('order_stoks.no_order', 'order_stoks.supplier_id', 'latest_orders.latest_created_at')
             ->get();
-        // $produks = Product::with('stokMasuk', 'stokKeluar')->get();
+
+
         $getBarangs = Product::with('stokMasuk', 'stokKeluar')->get();
-        $produks = $getBarangs->unique('nama_barang');
+
+        $produks = $getBarangs->groupBy('nama_barang')->map(function ($group) {
+            $averagePrice = $group->avg('harga');
+            $group[0]->harga = $averagePrice;
+            return $group[0];
+        });
+
+        // Mengubah hasil menjadi koleksi
+        $produks = collect($produks->values());
 
         $suppliers = Supplier::get();
         return view('pages.product.order', compact('setting', 'title', 'judul', 'orders', 'produks', 'suppliers'));
@@ -66,11 +76,13 @@ class OrderController extends Controller
         $qty = $request->qty;
         $supplier = $request->supplier;
         $no_order = "PO" . $date . rand(100000, 999999);
+        $no_jurnal = "JU" . rand(001, 999);
         $harga = $request->harga;
+        $total = 0;
 
         for ($i = 0; $i < count($nama_barang); $i++) {
             $sub_total = $qty[$i] * $harga[$i];
-
+            $total += $sub_total;
             OrderStok::create([
                 'no_order' => $no_order,
                 'supplier_id' => $supplier,
@@ -79,9 +91,17 @@ class OrderController extends Controller
                 'qty' => $qty[$i],
                 'harga' => $harga[$i],
                 'sub_total' => $sub_total,
-
             ]);
         }
+
+        Laporan::create([
+            'no_jurnal' => $no_jurnal,
+            'ket' => $no_order,
+            'akun_debet' => 'Pembelian',
+            'debit' => 0,
+            'akun_kredit' => 'Kas',
+            'kredit' => $total,
+        ]);
 
         return redirect()->route('product.order')
             ->with('success', 'PO Barang Berhasil');

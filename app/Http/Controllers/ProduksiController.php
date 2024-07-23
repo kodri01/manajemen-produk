@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BahanBaku;
 use App\Models\Product;
 use App\Models\ProductSell;
 use App\Models\Resep;
@@ -33,7 +34,8 @@ class ProduksiController extends Controller
             )->orderBy('created_at', 'desc')
             ->groupBy('no_resep', 'nama_resep', 'keterangan')
             ->get();
-        $produks = Product::get();
+        $getBarangs = Product::with('stokMasuk', 'stokKeluar')->get();
+        $produks = $getBarangs->unique('nama_barang');
         return view('pages.produksi.index', compact('setting', 'title', 'judul', 'reseps', 'produks', 'resep'));
     }
 
@@ -66,8 +68,11 @@ class ProduksiController extends Controller
         $no_resep = "RES" . $date . rand(100000, 999999);
 
         for ($i = 0; $i < count($nama_barang); $i++) {
+            $baku = BahanBaku::where('id', $nama_barang[$i])->first();
+            // dd($baku);
             Resep::create([
                 'no_resep' => $no_resep,
+                'baku_id' => $baku->id,
                 'produk_id' => $nama_barang[$i],
                 'qty' => $qty[$i],
                 'nama_resep' => $nama_resep,
@@ -97,6 +102,35 @@ class ProduksiController extends Controller
 
     public function produksi_store(Request $request, string $no)
     {
+        // $noResep = $no; // Ambil no dari parameter URL
+        // $reseps = Resep::with('produk')->where('no_resep', '=', $noResep)->get();
+        // $totalHargaBaku = 0;
+        // $namaProduk = $request->nama_produk;
+        // $qtyIn = $request->qty_in;
+        // $margin = $request->margin / 100;
+        // $biayaTenagaKerja = $request->biaya_pekerja;
+        // $biayaOverhead = $request->biaya_overhead;
+
+        // foreach ($reseps as $resep) {
+        //     if ($resep->produk) {
+        //         $produk_id = $resep->produk_id;
+        //         $qty = $resep->qty;
+        //         $hargaBaku = $resep->produk->harga;
+        //         $hargaProduksi = $qty * $hargaBaku;
+        //         $totalHargaBaku += $hargaProduksi;
+        //         $hpp = $totalHargaBaku + $biayaTenagaKerja + $biayaOverhead;
+        //         $marginLaba = $hpp * $margin;
+        //         $hargaJual = $hpp + $marginLaba;
+
+        //         StokKeluar::create([
+        //             'produk_id' => $produk_id,
+        //             'stok_keluar' => $qty,
+        //             'no_dokumen' => $resep->no_resep,
+        //             'keterangan' => 'Bahan Baku Produksi Resep',
+        //         ]);
+        //     }
+        // }
+
         $noResep = $no; // Ambil no dari parameter URL
         $reseps = Resep::with('produk')->where('no_resep', '=', $noResep)->get();
         $totalHargaBaku = 0;
@@ -106,31 +140,45 @@ class ProduksiController extends Controller
         $biayaTenagaKerja = $request->biaya_pekerja;
         $biayaOverhead = $request->biaya_overhead;
 
+        // Mengambil semua produk terkait resep dan menghitung harga rata-rata
+        $produkIds = $reseps->pluck('baku_id')->unique();
+        $produkHargaRataRata = Product::whereIn('baku_id', $produkIds)->get()->groupBy('nama_barang')->map(function ($group) {
+            return $group->avg('harga');
+        });
+
         foreach ($reseps as $resep) {
             if ($resep->produk) {
                 $produk_id = $resep->produk_id;
+                $baku_id = $resep->baku_id;
                 $qty = $resep->qty;
-                $hargaBaku = $resep->produk->harga;
+                // Menggunakan harga rata-rata dari produk terkait
+                $hargaBaku = $produkHargaRataRata[$resep->produk->nama_barang];
                 $hargaProduksi = $qty * $hargaBaku;
                 $totalHargaBaku += $hargaProduksi;
-                $hpp = $totalHargaBaku + $biayaTenagaKerja + $biayaOverhead;
-                $marginLaba = $hpp * $margin;
-                $hargaJual = $hpp + $marginLaba;
-
-                StokKeluar::create([
-                    'produk_id' => $produk_id,
-                    'stok_keluar' => $qty,
-                    'no_dokumen' => $resep->no_resep,
-                    'keterangan' => 'Bahan Baku Produksi Resep',
-                ]);
             }
         }
+
+        $hpp = $totalHargaBaku + $biayaTenagaKerja + $biayaOverhead;
+        $marginLaba = $hpp * $margin;
+        $hargaJual = $hpp + $marginLaba;
+
+        foreach ($reseps as $resep) {
+            StokKeluar::create([
+                'baku_id' => $resep->baku_id,
+                'produk_id' => $resep->produk_id,
+                'stok_keluar' => $resep->qty,
+                'no_dokumen' => $resep->no_resep,
+                'keterangan' => 'Bahan Baku Produksi Resep',
+            ]);
+        }
+
 
         $kdProduct = "SLL" . rand(1000, 9999) . date('dm');
         ProductSell::create([
             'no_resep' => $resep->no_resep,
             'kode_product' => $kdProduct,
             'nama_product' => $namaProduk,
+            'hpp' => $hpp,
             'harga_jual' => $hargaJual,
             'qty_in' => $qtyIn,
             'qty_out' => 0,

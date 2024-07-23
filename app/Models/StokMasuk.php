@@ -14,6 +14,7 @@ class StokMasuk extends Model
 
     protected $fillable = [
         'produk_id',
+        'baku_id',
         'supplier_id',
         'invoice',
         'stok_masuk',

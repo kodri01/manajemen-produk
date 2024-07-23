@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BahanBaku;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\StokKeluar;
@@ -22,9 +23,19 @@ class ProductController extends Controller
         $judul = "Stok Barang";
         $setting = Setting::first();
 
-        $products = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('created_at', 'asc')->get();
-        $product = Product::with(['stokMasuk', 'stokKeluar'])->first();
-        return view('pages.product.index', compact('setting', 'title', 'judul', 'products', 'product'));
+        $getProduk = Product::with(['stokMasuk', 'stokKeluar'])->orderBy('created_at', 'asc')->get();
+        // $products = $getProduk->unique('nama_barang');
+        $produks = $getProduk->groupBy('nama_barang')->map(function ($group) {
+            $averagePrice = $group->avg('harga');
+            $group[0]->harga = $averagePrice;
+            return $group[0];
+        });
+
+        // Mengubah hasil menjadi koleksi
+        $products = collect($produks->values());
+
+        // $product = Product::with(['stokMasuk', 'stokKeluar'])->first();
+        return view('pages.product.index', compact('setting', 'title', 'judul', 'products'));
     }
     /**
      * Store a newly created resource in storage.
@@ -127,12 +138,13 @@ class ProductController extends Controller
         $stok_masuk = StokMasuk::with('produk', 'supplier')->orderBy('created_at', 'asc')->get();
         $suppliers = Supplier::get();
         $produks = Product::get();
-        // dd($produks);
+        $bakus = BahanBaku::get();
+
         $setting = Setting::first();
 
         $title = "Product - Barang Masuk";
         $judul = "Barang Masuk";
-        return view('pages.product.masuk', compact('setting', 'title', 'judul', 'stok_masuk', 'suppliers', 'produks'));
+        return view('pages.product.masuk', compact('setting', 'title', 'judul', 'stok_masuk', 'suppliers', 'produks', 'bakus'));
     }
 
     public function masuk_store(Request $request)
@@ -160,25 +172,20 @@ class ProductController extends Controller
 
         $kdBarang = "PRD" . $request->satuan . rand(1000, 9999) . date('dm');
 
-        // Cek apakah nama produk sudah ada di database dengan penulisan huruf yang berbeda
-        $existingProduct = Product::whereRaw('LOWER(nama_barang) = ?', [strtolower($request->nama_barang)])->first();
-        // dd($existingProduct);
+        $baku = BahanBaku::where('id', $request->nama_barang)->first();
 
-        if (!$existingProduct) {
-            // Jika produk dengan nama yang sama belum ada, simpan produk baru
-            $produk = Product::create([
-                'kode_barang' => $kdBarang,
-                'nama_barang' => $request->nama_barang,
-                'satuan' => $request->satuan,
-                'harga' => $request->harga,
-            ]);
-        } else {
-            // Jika produk dengan nama yang sama sudah ada, gunakan produk yang ada
-            $produk = $existingProduct;
-        }
+        // dd($baku);
+        $produk = Product::create([
+            'baku_id' => $baku->id,
+            'kode_barang' => $kdBarang,
+            'nama_barang' => $baku->name,
+            'satuan' => $request->satuan,
+            'harga' => $request->harga,
+        ]);
 
         // Lanjutkan ke kode berikutnya
         StokMasuk::create([
+            'baku_id' => $produk->baku_id,
             'produk_id' => $produk->id,
             'supplier_id' => $request->supplier,
             'invoice' => $request->invoice,
@@ -241,7 +248,9 @@ class ProductController extends Controller
     public function keluar()
     {
         $stok_keluar = StokKeluar::with('produk')->orderBy('created_at', 'desc')->get();
-        $produks = Product::get();
+        $getProduk = Product::get();
+        $produks = $getProduk->unique('nama_barang');
+
         $setting = Setting::first();
 
         $title = "Product - Barang Keluar";
@@ -268,8 +277,12 @@ class ProductController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $baku = BahanBaku::where('id', $request->produk)->first();
+        $produk = Product::where('baku_id', $request->produk)->first();
+
         StokKeluar::create([
-            'produk_id' => $request->produk,
+            'baku_id' => $baku->id,
+            'produk_id' => $produk->id,
             'stok_keluar' => $request->jml_keluar,
             'no_dokumen' => $request->no_dokumen,
             'keterangan' => $request->keterangan,
@@ -323,7 +336,46 @@ class ProductController extends Controller
         return redirect()->back()->with('error', 'Data Berhasil dihapus');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function bahan_baku()
+    {
+        $setting = Setting::first();
+        $title = "Product - Bahan Baku";
+        $judul = "Bahan Baku";
+
+        $bakus = BahanBaku::get();
+        return view('pages.product.bahan_baku', compact('setting', 'title', 'judul', 'bakus'));
+    }
+
+    public function baku_store(Request $request)
+    {
+        BahanBaku::create([
+            'name' => $request->name,
+        ]);
+
+        return redirect()->route('product.baku')
+            ->with('success', 'Data Berhasil ditambahkan');
+    }
+
+    public function edit_baku($id)
+    {
+        $product = BahanBaku::findOrFail($id);
+        return response()->json($product);
+    }
+
+    public function update_baku(Request $request)
+    {
+
+        $baku = BahanBaku::findOrFail($request->id);
+        $baku->name = $request->name;
+
+        $baku->save();
+
+        return redirect()->back()->with('success', 'Data Berhasil diubah');
+    }
+
+    public function destroy_baku($id)
+    {
+        BahanBaku::find($id)->delete();
+        return redirect()->back()->with('error', 'Data Berhasil dihapus');
+    }
 }

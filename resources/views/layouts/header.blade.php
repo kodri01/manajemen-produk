@@ -68,7 +68,7 @@
 
             @role(['administrator', 'gudang'])
                 <!-- Nav Item - Barang Collapse Menu -->
-                <li class="nav-item <?php if ($title == 'Product - Stok Barang' || $title == 'Product - Barang Masuk' || $title == 'Product - Purchase Order' || $title == 'Product - Details Order' || $title == 'Product - Barang Keluar') {
+                <li class="nav-item <?php if ($title == 'Product - Stok Barang' || $title == 'Product - Barang Masuk' || $title == 'Product - Purchase Order' || $title == 'Product - Details Order' || $title == 'Product - Barang Keluar' || $title == 'Product - Bahan Baku') {
                     echo 'active';
                 } ?>">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
@@ -76,7 +76,7 @@
                         <i class="fas fa-fw fa-box"></i>
                         <span>Manage Product</span>
                     </a>
-                    <div class="collapse <?php if ($title == 'Product - Stok Barang' || $title == 'Product - Barang Masuk' || $title == 'Product - Purchase Order' || $title == 'Product - Details Order' || $title == 'Product - Barang Keluar') {
+                    <div class="collapse <?php if ($title == 'Product - Stok Barang' || $title == 'Product - Barang Masuk' || $title == 'Product - Purchase Order' || $title == 'Product - Details Order' || $title == 'Product - Barang Keluar' || $title == 'Product - Bahan Baku') {
                         echo 'show';
                     } ?>" id="collapseTwo" aria-labelledby="headingTwo"
                         data-parent="#accordionSidebar">
@@ -96,6 +96,9 @@
                                 echo 'active';
                             } ?>" href="{{ route('product.order') }}">PO
                                 Barang</a>
+                            <a class="collapse-item <?php if ($title == 'Product - Bahan Baku' || $title == 'Product - Bahan Baku') {
+                                echo 'active';
+                            } ?>" href="{{ route('product.baku') }}">Bahan Baku</a>
 
                         </div>
                     </div>
@@ -150,26 +153,32 @@
                 </li>
 
                 <!-- Divider -->
-                <hr class="sidebar-divider">
 
-                <li class="nav-item  <?php if ($title == 'Transaksi') {
+
+                <li class="nav-item <?php if ($title == 'Transaksi' || $title == 'Transaksi - Kas Keluar') {
                     echo 'active';
                 } ?>">
-                    <a class="nav-link" href="{{ route('transaksi') }}">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFive"
+                        aria-expanded="true" aria-controls="collapseFive">
                         <i class="fas fa-fw fa-clipboard-list"></i>
-                        <span>Transaksi</span></a>
+                        <span>Transaksi</span>
+                    </a>
+                    <div class="collapse <?php if ($title == 'Transaksi' || $title == 'Transaksi - Kas Keluar') {
+                        echo 'show';
+                    } ?>" id="collapseFive" aria-labelledby="headingOne"
+                        data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item <?php if ($title == 'Transaksi') {
+                                echo 'active';
+                            } ?>" href="{{ route('transaksi') }}">Transaksi</a>
+                            <a class="collapse-item <?php if ($title == 'Transaksi - Kas Keluar') {
+                                echo 'active';
+                            } ?>" href="{{ route('kas') }}">Kas Keluar</a>
+                        </div>
+                    </div>
                 </li>
 
-                <!-- Divider -->
-                <li class="nav-item  <?php if ($title == 'Data Users') {
-                    echo 'active';
-                } ?>">
-                    <a class="nav-link" href="{{ route('users') }}">
-                        <i class="fas fa-fw fa-users"></i>
-                        <span>Users</span></a>
-                </li>
-
-                <li class="nav-item <?php if ($title == 'Laporan - Neraca' || $title == 'Laporan - Laba Rugi' || $title == 'Laporan - Perubahan Modal') {
+                <li class="nav-item <?php if ($title == 'Laporan - Neraca' || $title == 'Laporan - Laba Rugi' || $title == 'Laporan - Perubahan Modal' || $title == 'Laporan - Jurnal Umum' || $title == 'Laporan - Buku Besar') {
                     echo 'active';
                 } ?>">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse4"
@@ -177,7 +186,7 @@
                         <i class="fas fa-fw fa-receipt"></i>
                         <span>Laporan</span>
                     </a>
-                    <div class="collapse <?php if ($title == 'Laporan - Neraca' || $title == 'Laporan - Laba Rugi' || $title == 'Laporan - Perubahan Modal') {
+                    <div class="collapse <?php if ($title == 'Laporan - Neraca' || $title == 'Laporan - Laba Rugi' || $title == 'Laporan - Perubahan Modal' || $title == 'Laporan - Jurnal Umum' || $title == 'Laporan - Buku Besar') {
                         echo 'show';
                     } ?>" id="collapse4" aria-labelledby="heading1"
                         data-parent="#accordionSidebar">
@@ -193,10 +202,39 @@
                                 echo 'active';
                             } ?>" href="{{ route('lap.modal') }}">Perubahan
                                 Modal</a>
+                            <a class="collapse-item <?php if ($title == 'Laporan - Jurnal Umum') {
+                                echo 'active';
+                            } ?>" href="{{ route('lap.jurnal') }}">Jurnal
+                                Umum</a>
+                            <a class="collapse-item <?php if ($title == 'Laporan - Buku Besar') {
+                                echo 'active';
+                            } ?>" href="{{ route('lap.buku') }}">Buku Besar
+                            </a>
 
                         </div>
                     </div>
                 </li>
+
+                <hr class="sidebar-divider">
+
+                <li class="nav-item  <?php if ($title == 'Master - Master Akun') {
+                    echo 'active';
+                } ?>">
+                    <a class="nav-link" href="{{ route('master') }}">
+                        <i class="fas fa-fw fa-book-open"></i>
+                        <span>Master Akun</span></a>
+                </li>
+
+                <!-- Divider -->
+                <li class="nav-item  <?php if ($title == 'Data Users') {
+                    echo 'active';
+                } ?>">
+                    <a class="nav-link" href="{{ route('users') }}">
+                        <i class="fas fa-fw fa-users"></i>
+                        <span>Users</span></a>
+                </li>
+
+
 
                 <li class="nav-item  <?php if ($title == 'Setting') {
                     echo 'active';

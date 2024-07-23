@@ -5,6 +5,7 @@ use App\Http\Controllers\BahanBakuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\MasterController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProduksiController;
@@ -67,21 +68,37 @@ Route::group(['middleware' => 'auth'], function () {
         Route::delete('/transaksi/delete/{id}', [TransaksiController::class, 'destroy'])->name('transaksi.delete');
         Route::get('invoice/transaksi/{no}', [InvoiceController::class, 'invoice_transaksi'])->name('invoice.transaksi');
 
+        //Transaksi - Kas Keluar
+        Route::get('kas_keluar', [TransaksiController::class, 'kas_keluar'])->name('kas');
+        Route::post('/kas_keluar', [TransaksiController::class, 'store_kas'])->name('add.kas');
+        Route::get('/kas_keluar/{id}/edit', [TransaksiController::class, 'edit_kas'])->name('edit.kas');
+        Route::put('/kas_keluar', [TransaksiController::class, 'update_kas'])->name('update.kas');
+        Route::delete('/kas_keluar/delete/{id}', [TransaksiController::class, 'destroy_kas'])->name('delete.kas');
+
         //laporan
         Route::get('laporan/neraca', [LaporanController::class, 'index'])->name('lap.neraca');
         Route::get('laporan/rugi', [LaporanController::class, 'laba_rugi'])->name('lap.laba');
         Route::get('laporan/modal', [LaporanController::class, 'per_modal'])->name('lap.modal');
+        Route::get('laporan/jurnal_umum', [LaporanController::class, 'jurnal_umum'])->name('lap.jurnal');
+        Route::get('laporan/buku_besar', [LaporanController::class, 'buku_besar'])->name('lap.buku');
 
         //setting
         Route::get('setting', [SettingController::class, 'index'])->name('setting');
         Route::get('/setting/{id}/edit', [SettingController::class, 'edit'])->name('edit.setting');
         Route::put('/setting', [SettingController::class, 'store'])->name('update.setting');
+
+        //Master Akun
+        Route::get('/master_akun', [MasterController::class, 'index'])->name('master');
+        Route::post('/master', [MasterController::class, 'store'])->name('add.master');
+        Route::get('/master/{id}/edit', [MasterController::class, 'edit'])->name('edit.master');
+        Route::put('/master', [MasterController::class, 'update'])->name('update.master');
+        Route::delete('/master/delete/{id}', [MasterController::class, 'destroy'])->name('delete.master');
     });
 
     Route::group(['middleware' => ['role:administrator|gudang']], function () {
+
         //Stok Produk
         Route::get('produks', [ProductController::class, 'index'])->name('product');
-        // Route::post('produks', [ProductController::class, 'store'])->name('add.product');
         Route::get('/produks/{id}/edit', [ProductController::class, 'edit'])->name('edit.product');
         Route::put('/produks', [ProductController::class, 'update'])->name('update.product');
         Route::delete('/produks/delete/{id}', [ProductController::class, 'destroy'])->name('delete.product');
@@ -105,6 +122,13 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/order', [OrderController::class, 'store'])->name('order.store');
         Route::get('/order/details/{no}', [OrderController::class, 'show'])->name('order.details');
         Route::delete('/order/delete/{id}', [OrderController::class, 'destroy'])->name('order.delete');
+
+        //Bahan Baku
+        Route::get('baku', [ProductController::class, 'bahan_baku'])->name('product.baku');
+        Route::post('baku', [ProductController::class, 'baku_store'])->name('add.baku');
+        Route::get('/baku/{id}/edit', [ProductController::class, 'edit_baku'])->name('edit.baku');
+        Route::put('/baku', [ProductController::class, 'update_baku'])->name('update.baku');
+        Route::delete('/baku/delete/{id}', [ProductController::class, 'destroy_baku'])->name('delete.baku');
     });
 
     Route::group(['middleware' => ['role:administrator|produksi']], function () {

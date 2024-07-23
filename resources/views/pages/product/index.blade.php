@@ -30,6 +30,7 @@
                             <th>#</th>
                             <th>Kode Barang</th>
                             <th>Nama Barang</th>
+                            <th>Harga Barang (Average)</th>
                             <th>Satuan</th>
                             <th>Jumlah Stok</th>
                             <th>Stok Masuk</th>
@@ -43,6 +44,7 @@
                             <th>#</th>
                             <th>Kode Barang</th>
                             <th>Nama Barang</th>
+                            <th>Harga Barang (Average)</th>
                             <th>Satuan</th>
                             <th>Jumlah Stok</th>
                             <th>Stok Masuk</th>
@@ -54,10 +56,10 @@
                     <tbody>
                         @foreach ($products as $produk)
                             @php
-                                $id_produk = $produk->id;
-                                $totalStokMasuk = $produk->stokMasuk->where('produk_id', $id_produk)->sum('stok_masuk');
+                                $id_produk = $produk->baku_id;
+                                $totalStokMasuk = $produk->stokMasuk->where('baku_id', $id_produk)->sum('stok_masuk');
                                 $totalStokKeluar = $produk->stokKeluar
-                                    ->where('produk_id', $id_produk)
+                                    ->where('baku_id', $id_produk)
                                     ->sum('stok_keluar');
                                 $stok = $totalStokMasuk - $totalStokKeluar;
                             @endphp
@@ -66,6 +68,10 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $produk->kode_barang }}</td>
                                 <td>{{ $produk->nama_barang }}</td>
+                                <td>
+                                    {{ 'Rp ' . number_format($produk->harga, 0, ',', '.') }}
+
+                                </td>
                                 <td>{{ $produk->satuan }}</td>
                                 <td>
                                     {{ $stok }}
@@ -106,71 +112,6 @@
             </div>
         </div>
 
-        {{-- <div class="modal fade" id="stokModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Tambah Data Barang</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ route('add.product') }}" method="post">
-                            <div class="modal-body">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-6 col-lg-6">
-                                        <div class="form-floating mb-3">
-                                            <input type="text"
-                                                class="form-control @error('nama_barang') is-invalid @enderror"
-                                                id="floatingInput" placeholder="Nama Barang" name="nama_barang">
-                                            <label for="floatingInput">Nama Barang</label>
-                                        </div>
-                                        @error('nama_barang')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6">
-                                        <div class="form-floating">
-                                            <select class="form-select form-control @error('satuan') is-invalid @enderror"
-                                                id="floatingSelect" aria-label="Floating label select example"
-                                                name="satuan">
-                                                <option selected disabled>Pilih Satuan Produk</option>
-                                                <option value="L">Liter</option>
-                                                <option value="KG">KG</option>
-                                                <option value="GR">Gram</option>
-                                                <option value="PCS">PCS</option>
-                                                <option value="UNIT">Unit</option>
-                                            </select>
-                                            <label for="floatingSelect">Satuan</label>
-                                        </div>
-                                        @error('satuan')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6">
-                                        <div class="form-floating mb-3">
-                                            <input type="text" class="form-control @error('harga') is-invalid @enderror"
-                                                id="floatingInput" placeholder="Harga Barang" name="harga">
-                                            <label for="floatingInput">@ Harga</label>
-                                        </div>
-                                        @error('harga')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-warning" type="button" data-dismiss="modal">Cancel</button>
-                                <button class="btn btn-primary" type="submit">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
 
         <div class="modal fade" id="produkModalEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">

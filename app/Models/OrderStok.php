@@ -31,4 +31,19 @@ class OrderStok extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function laporan()
+    {
+        return $this->hasMany(Laporan::class, 'ket');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($order) {
+            // Hapus data terkait
+            $order->laporan()->delete();
+        });
+    }
 }

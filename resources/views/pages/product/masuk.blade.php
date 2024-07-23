@@ -134,10 +134,17 @@
 
                                 <div class="col-sm-12 col-md-6 col-lg-6">
                                     <div class="form-floating mb-3">
-                                        <input type="text"
-                                            class="form-control @error('nama_barang') is-invalid @enderror"
-                                            id="floatingInput" placeholder="Nama Barang" name="nama_barang">
-                                        <label for="floatingInput">Nama Barang</label>
+                                        <select class="form-select form-control @error('nama_barang') is-invalid @enderror"
+                                            id="floatingSelect" aria-label="Floating label select example"
+                                            name="nama_barang">
+                                            <option selected disabled>Pilih Bahan Baku </option>
+                                            @foreach ($bakus as $bahan)
+                                                <option value="{{ $bahan->id }}" class="text-capitalize">
+                                                    {{ $bahan->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="floatingSelect">Bahan Baku</label>
+
                                     </div>
                                     @error('nama_barang')
                                         <div class="invalid-feedback">{{ $message }}</div>

@@ -16,6 +16,7 @@ class ProductSell extends Model
         'no_resep',
         'kode_product',
         'nama_product',
+        'hpp',
         'harga_jual',
         'qty_in',
         'qty_out',

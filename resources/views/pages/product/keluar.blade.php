@@ -106,8 +106,8 @@
                                             id="floatingSelect" aria-label="Floating label select example" name="produk">
                                             <option selected disabled>Pilih Barang</option>
                                             @foreach ($produks as $pro)
-                                                <option value="{{ $pro->id }}" class="text-capitalize">
-                                                    {{ $pro->kode_barang }} >
+                                                <option value="{{ $pro->baku_id }}" class="text-capitalize">
+
                                                     {{ $pro->nama_barang }} </option>
                                             @endforeach
                                         </select>

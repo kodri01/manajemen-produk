@@ -15,6 +15,7 @@ class Resep extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'baku_id',
         'produk_id',
         'no_resep',
         'qty',

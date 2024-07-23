@@ -13,6 +13,7 @@ class Product extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'baku_id',
         'kode_barang',
         'nama_barang',
         'satuan',
@@ -26,12 +27,12 @@ class Product extends Model
 
     public function stokMasuk()
     {
-        return $this->hasMany(StokMasuk::class, 'produk_id');
+        return $this->hasMany(StokMasuk::class, 'baku_id');
     }
 
     public function stokKeluar()
     {
-        return $this->hasMany(StokKeluar::class, 'produk_id');
+        return $this->hasMany(StokKeluar::class, 'baku_id');
     }
 
     public function order()

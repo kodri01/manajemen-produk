@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Laporan;
+use App\Models\Master;
 use App\Models\Product;
 use App\Models\ProductSell;
 use App\Models\Setting;
@@ -61,8 +63,11 @@ class TransaksiController extends Controller
         $nama_barang = $request->nama_barang;
         $qty = $request->qty;
         $no_transaksi = "TRS" . $date . rand(100000, 999999);
+        $no_jurnal = "JU" . rand(001, 999);
         $harga = $request->harga;
         $sub_total = $request->subtotal;
+        $totalSub = 0;
+        $total = 0;
 
 
         for ($i = 0; $i < count($nama_barang); $i++) {
@@ -80,35 +85,22 @@ class TransaksiController extends Controller
                 $produk->qty_out += $qty[$i]; // Menambahkan qty ke qty_out yang sudah ada
                 $produk->save();
             }
+            $totalSub = $sub_total[$i];
+            $total += $totalSub;
         }
+
+        Laporan::create([
+            'no_jurnal' => $no_jurnal,
+            'ket' => $no_transaksi,
+            'akun_debet' => 'Penjualan',
+            'debit' => $total,
+            'akun_kredit' => 'Pendapatan Penjualan',
+            'kredit' => 0,
+        ]);
 
 
         return redirect()->route('invoice.transaksi', $transaksi->no_transaksi)
             ->with('success', 'Transaksi Berhasil');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
     }
 
     /**
@@ -137,5 +129,63 @@ class TransaksiController extends Controller
 
         Transaksi::where('no_transaksi', $no_transaksi)->delete();
         return redirect()->back()->with('error', 'Data Transaksi Berhasil dihapus');
+    }
+
+
+    public function kas_keluar()
+    {
+        $title = "Transaksi - Kas Keluar";
+        $judul = "Kas Keluar";
+        $setting = Setting::first();
+        $masters = Master::get();
+        $masterName = $masters->pluck('name')->toArray();
+
+        $kass = Laporan::whereIn('akun_kredit', $masterName)
+            ->select('akun_kredit', 'kredit', 'no_jurnal', 'ket', 'created_at', 'id')
+            ->get();
+
+        // dd($kass);
+        return view('pages.transaksi.kas_keluar', compact('setting', 'title', 'judul', 'kass', 'masters'));
+    }
+
+    public function store_kas(Request $request)
+    {
+        $no_jurnal = "JU" . rand(001, 999);
+
+        Laporan::create([
+            'no_jurnal' => $no_jurnal,
+            'ket' => $request->ket,
+            'akun_debet' => 'Kas',
+            'debit' => 0,
+            'akun_kredit' => $request->akun,
+            'kredit' => $request->nominal,
+        ]);
+
+        return redirect()->route('kas')
+            ->with('success', 'Pencatatan Kas Keluar Berhasil');
+    }
+
+    public function edit_kas($id)
+    {
+        $kas = Laporan::findOrFail($id);
+        return response()->json($kas);
+    }
+
+    public function update_kas(Request $request)
+    {
+        $kas = Laporan::findOrFail($request->id);
+        $kas->akun_debet = $request->akun;
+        $kas->debit = $request->nominal;
+        $kas->ket = $request->ket;
+
+        $kas->save();
+
+        return redirect()->back()->with('success', 'Data Kas Keluar Berhasil diubah');
+    }
+
+    public function destroy_kas($id)
+    {
+        Laporan::findOrFail($id)->delete();
+        return redirect()->back()->with('error', 'Data Kas Keluar Berhasil dihapus');
     }
 }

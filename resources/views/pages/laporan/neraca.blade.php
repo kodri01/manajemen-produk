@@ -34,24 +34,6 @@
                                         <div class="col-sm-6">
                                             <span>Kas</span>
                                         </div>
-                                        {{-- <div class="col-sm-6">
-                                        <span>Rp. 200.000</span>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <span>Giro</span>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <span>Rp. 200.000</span>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <span>Deposito</span>
-                                    </div> --}}
-                                        {{-- <div class="col-sm-6">
-                                        <span><u class="mt-2">
-                                                {{ 'Rp ' . number_format($transaksi->kas, 0, ',', '.') }}</u>
-                                            <sub>+</sub>
-                                        </span>
-                                    </div> --}}
                                         <div class="col-sm-6">
                                             <span>{{ 'Rp ' . number_format($kas, 0, ',', '.') }}</span>
                                         </div>

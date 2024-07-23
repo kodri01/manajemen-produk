@@ -207,7 +207,7 @@
                                                             data-nama-barang="{{ $produk->nama_barang }}"
                                                             data-satuan="{{ $produk->satuan }}"
                                                             data-stok="{{ $stok }}"
-                                                            data-id-barang="{{ $produk->id }}">
+                                                            data-id-barang="{{ $produk->baku_id }}">
                                                             <div class="card shadow" style="width: 110px;height:160px">
                                                                 <div class="container d-flex align-items-center justify-content-center"
                                                                     style="width: 110px;height:110px;background-color:rgb(171, 170, 170)">
@@ -217,9 +217,7 @@
                                                                 </div>
                                                                 <span for="" class="text-center mt-2"
                                                                     style="font-size: 12px">{{ $produk->nama_barang }}</span>
-                                                                <span for="" class="text-center"
-                                                                    style="font-size: 12px"><strong>Stok :
-                                                                        {{ $stok }}</strong></span>
+
                                                             </div>
                                                         </a>
                                                     </div>
