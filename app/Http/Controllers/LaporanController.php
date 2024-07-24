@@ -53,12 +53,13 @@ class LaporanController extends Controller
 
         $produkSell = ProductSell::whereYear('created_at', $selectedYear)->sum(DB::raw('hpp'));
 
-        $debit = Laporan::whereYear('created_at', $selectedYear)->sum(DB::raw('debit'));
-        $kredit = Laporan::whereYear('created_at', $selectedYear)->sum(DB::raw('kredit'));
+        $debit = Laporan::whereYear('created_at', $selectedYear)->where('akun_debet', 'Kas')->sum(DB::raw('debit'));
+        $kredit = Laporan::whereYear('created_at', $selectedYear)->where('akun_kredit', 'Kas')->sum(DB::raw('kredit'));
+        // dd($debit);
         $masters = Master::get();
         $masterName = $masters->pluck('name')->toArray();
-        $bebanUsaha = Laporan::whereIn('akun_kredit', $masterName)
-            ->sum(DB::raw('kredit'));
+        $bebanUsaha = Laporan::whereIn('akun_debet', $masterName)
+            ->sum(DB::raw('debit'));
 
         $labaKotor = ($persediaanAwal + $transaksi->sell) - $produkSell;
 
@@ -119,8 +120,8 @@ class LaporanController extends Controller
 
         $masters = Master::get();
         $masterName = $masters->pluck('name')->toArray();
-        $kass = Laporan::whereIn('akun_kredit', $masterName)
-            ->sum(DB::raw('kredit'));
+        $kass = Laporan::whereIn('akun_debet', $masterName)
+            ->sum(DB::raw('debit'));
         // dd($kass);
         $bebanUsaha = $kass;
         $labaKotor = ($pendapatanAwal + $transaksi->sell) - $produkSell;
@@ -158,8 +159,8 @@ class LaporanController extends Controller
 
         $selectedYear = $request->input('tahun', reset($tahun));
 
-        $debit = Laporan::whereYear('created_at', $selectedYear)->sum(DB::raw('debit'));
-        $kredit = Laporan::whereYear('created_at', $selectedYear)->sum(DB::raw('kredit'));
+        $debit = Laporan::whereYear('created_at', $selectedYear)->where('akun_debet', 'Kas')->sum(DB::raw('debit'));
+        $kredit = Laporan::whereYear('created_at', $selectedYear)->where('akun_kredit', 'Kas')->sum(DB::raw('kredit'));
 
         $transaksi = Transaksi::select(
             DB::raw('(SELECT SUM(transaksis.sub_total)) AS sell')
@@ -177,25 +178,14 @@ class LaporanController extends Controller
 
         $masters = Master::get();
         $masterName = $masters->pluck('name')->toArray();
-        $kass = Laporan::whereIn('akun_kredit', $masterName)
-            ->sum(DB::raw('kredit'));
+        $kass = Laporan::whereIn('akun_debet', $masterName)
+            ->sum(DB::raw('debit'));
         // dd($kass);
         $modal = ($modalAwal + $debit) - $kredit;
         $bebanUsaha = $kass;
         $labaKotor = ($persediaan + $transaksi->sell) - $produkSell;
 
         $labaBersih = $labaKotor - $bebanUsaha - $pajak;
-
-        // $prive = $persediaan;
-        // } else {
-        //     $labaBersih = 0;
-        // }
-
-        // if ($produkModal != null) {
-        //     $produkModal = $produkModal;
-        // } else {
-        //     $modalAwal = 6000000;
-        // }
 
         if ($tahun != null) {
             $tahun;
@@ -227,19 +217,25 @@ class LaporanController extends Controller
         $masterName = $masters->pluck('name')->toArray();
 
         $laporans = Laporan::where(function ($query) use ($masterName) {
-            $query->whereIn('akun_kredit', $masterName)
+            $query->whereIn('akun_debet', $masterName)
                 ->orWhere('akun_debet', 'Penjualan')
+                ->orWhere('akun_debet', 'Kas')
                 ->orWhere('akun_kredit', 'Kas');
         })
             ->select('akun_debet', 'debit', 'akun_kredit', 'kredit', 'no_jurnal', 'ket', 'created_at')
             ->get();
         $penjualan = Laporan::where('akun_debet', 'Penjualan')
+            ->orWhere('akun_debet', 'Kas')
             ->select('akun_debet', 'debit', 'no_jurnal', 'ket', 'created_at')
             ->get();
 
-        $beban = Laporan::whereIn('akun_kredit', $masterName)
-            ->select('akun_kredit', 'kredit', 'no_jurnal', 'ket', 'created_at')
+        $beli = Laporan::where('akun_debet', 'Pembelian')
+            ->select('akun_debet', 'debit', 'no_jurnal', 'ket', 'created_at')
             ->get();
-        return view('pages.laporan.buku_besar', compact('setting', 'title', 'judul', 'laporans', 'penjualan', 'beban', 'masters', 'masterName'));
+
+        $beban = Laporan::whereIn('akun_debet', $masterName)
+            ->select('akun_debet', 'debit', 'no_jurnal', 'ket', 'created_at')
+            ->get();
+        return view('pages.laporan.buku_besar', compact('setting', 'title', 'judul', 'laporans', 'penjualan', 'beli', 'beban', 'masters', 'masterName'));
     }
 }

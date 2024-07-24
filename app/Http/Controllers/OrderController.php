@@ -98,7 +98,7 @@ class OrderController extends Controller
             'no_jurnal' => $no_jurnal,
             'ket' => $no_order,
             'akun_debet' => 'Pembelian',
-            'debit' => 0,
+            'debit' => $total,
             'akun_kredit' => 'Kas',
             'kredit' => $total,
         ]);
@@ -148,6 +148,7 @@ class OrderController extends Controller
      */
     public function destroy(string $no_order)
     {
+        Laporan::where('ket', $no_order)->delete();
         OrderStok::where('no_order', $no_order)->delete();
         return redirect()->back()->with('error', 'Data Order Berhasil dihapus');
     }

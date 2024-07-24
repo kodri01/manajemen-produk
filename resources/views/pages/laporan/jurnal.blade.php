@@ -35,11 +35,11 @@
                                             <td>{{ $lap->no_jurnal }}</td>
                                             <td>{{ $lap->ket }}</td>
                                             <td>{{ $lap->akun_debet }}</td>
-                                            <td>
+                                            <td class="text-success">
                                                 {{ 'Rp ' . number_format($lap->debit, 0, ',', '.') }}
                                             </td>
                                             <td>{{ $lap->akun_kredit }}</td>
-                                            <td>
+                                            <td class="text-danger">
                                                 {{ 'Rp ' . number_format($lap->kredit, 0, ',', '.') }}
                                             </td>
                                         </tr>

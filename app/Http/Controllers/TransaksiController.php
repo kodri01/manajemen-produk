@@ -92,10 +92,10 @@ class TransaksiController extends Controller
         Laporan::create([
             'no_jurnal' => $no_jurnal,
             'ket' => $no_transaksi,
-            'akun_debet' => 'Penjualan',
+            'akun_debet' => 'Kas',
             'debit' => $total,
-            'akun_kredit' => 'Pendapatan Penjualan',
-            'kredit' => 0,
+            'akun_kredit' => 'Pendapatan',
+            'kredit' => $total,
         ]);
 
 
@@ -140,8 +140,8 @@ class TransaksiController extends Controller
         $masters = Master::get();
         $masterName = $masters->pluck('name')->toArray();
 
-        $kass = Laporan::whereIn('akun_kredit', $masterName)
-            ->select('akun_kredit', 'kredit', 'no_jurnal', 'ket', 'created_at', 'id')
+        $kass = Laporan::whereIn('akun_debet', $masterName)
+            ->select('akun_debet', 'debit', 'no_jurnal', 'ket', 'created_at', 'id')
             ->get();
 
         // dd($kass);
@@ -155,9 +155,9 @@ class TransaksiController extends Controller
         Laporan::create([
             'no_jurnal' => $no_jurnal,
             'ket' => $request->ket,
-            'akun_debet' => 'Kas',
-            'debit' => 0,
-            'akun_kredit' => $request->akun,
+            'akun_debet' => $request->akun,
+            'debit' => $request->nominal,
+            'akun_kredit' => 'Kas',
             'kredit' => $request->nominal,
         ]);
 

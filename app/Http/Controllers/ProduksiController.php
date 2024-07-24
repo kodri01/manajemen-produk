@@ -102,35 +102,6 @@ class ProduksiController extends Controller
 
     public function produksi_store(Request $request, string $no)
     {
-        // $noResep = $no; // Ambil no dari parameter URL
-        // $reseps = Resep::with('produk')->where('no_resep', '=', $noResep)->get();
-        // $totalHargaBaku = 0;
-        // $namaProduk = $request->nama_produk;
-        // $qtyIn = $request->qty_in;
-        // $margin = $request->margin / 100;
-        // $biayaTenagaKerja = $request->biaya_pekerja;
-        // $biayaOverhead = $request->biaya_overhead;
-
-        // foreach ($reseps as $resep) {
-        //     if ($resep->produk) {
-        //         $produk_id = $resep->produk_id;
-        //         $qty = $resep->qty;
-        //         $hargaBaku = $resep->produk->harga;
-        //         $hargaProduksi = $qty * $hargaBaku;
-        //         $totalHargaBaku += $hargaProduksi;
-        //         $hpp = $totalHargaBaku + $biayaTenagaKerja + $biayaOverhead;
-        //         $marginLaba = $hpp * $margin;
-        //         $hargaJual = $hpp + $marginLaba;
-
-        //         StokKeluar::create([
-        //             'produk_id' => $produk_id,
-        //             'stok_keluar' => $qty,
-        //             'no_dokumen' => $resep->no_resep,
-        //             'keterangan' => 'Bahan Baku Produksi Resep',
-        //         ]);
-        //     }
-        // }
-
         $noResep = $no; // Ambil no dari parameter URL
         $reseps = Resep::with('produk')->where('no_resep', '=', $noResep)->get();
         $totalHargaBaku = 0;

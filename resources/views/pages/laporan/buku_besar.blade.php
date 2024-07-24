@@ -28,6 +28,11 @@
                                             data-target="#pills-profile" type="button" role="tab"
                                             aria-controls="pills-profile" aria-selected="false">Pendapatan</button>
                                     </li>
+                                    <li class="nav-item mr-3" role="presentation">
+                                        <button class="nav-link btn-sm" id="pills-beli-tab" data-toggle="pill"
+                                            data-target="#pills-beli" type="button" role="tab"
+                                            aria-controls="pills-beli" aria-selected="false">Pembelian</button>
+                                    </li>
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link btn-sm" id="pills-contact-tab" data-toggle="pill"
                                             data-target="#pills-contact" type="button" role="tab"
@@ -44,6 +49,7 @@
                                                         <th scope="col">Tanggal</th>
                                                         <th scope="col">Keterangan</th>
                                                         <th scope="col">Referensi</th>
+                                                        <th scope="col">Akun</th>
                                                         <th scope="col">Debit</th>
                                                         <th scope="col">Kredit</th>
                                                         <th scope="col">Saldo</th>
@@ -52,6 +58,7 @@
                                                 <tbody>
                                                     @php
                                                         $modalAwal = 6000000; // Nilai modal awal
+                                                        $color = ''; // Nilai modal awal
                                                         $masterName = $masters->pluck('name')->toArray();
                                                     @endphp
                                                     <tr>
@@ -60,34 +67,43 @@
                                                         <td></td>
                                                         <td></td>
                                                         <td></td>
-                                                        <td>{{ 'Rp ' . number_format($modalAwal, 0, ',', '.') }}</td>
+                                                        <td></td>
+                                                        <td class="text-success">
+                                                            {{ 'Rp ' . number_format($modalAwal, 0, ',', '.') }}</td>
                                                     </tr>
                                                     @foreach ($laporans as $lap)
                                                         @php
                                                             // Update nilai modal berdasarkan debit atau kredit
-                                                            if ($lap->akun_debet == 'Penjualan') {
+                                                            if ($lap->akun_debet == 'Kas') {
                                                                 $modalAwal += $lap->debit;
+                                                                $color = 'text-success';
                                                             } elseif (
                                                                 $lap->akun_kredit == 'Kas' ||
-                                                                in_array($lap->akun_kredit, $masterName)
+                                                                $lap->akun_debet == 'Penjualan' ||
+                                                                in_array($lap->akun_debet, $masterName)
                                                             ) {
                                                                 $modalAwal -= $lap->kredit;
+                                                                $color = 'text-danger';
                                                             }
                                                         @endphp
                                                         <tr>
                                                             <td>{{ date('d/M/Y', strtotime($lap->created_at)) }}</td>
                                                             <td>{{ $lap->ket }}</td>
                                                             <td>{{ $lap->no_jurnal }}</td>
-                                                            @if ($lap->akun_debet == 'Penjualan')
-                                                                <td>{{ 'Rp ' . number_format($lap->debit, 0, ',', '.') }}
+                                                            <td>{{ $lap->akun_debet }}</td>
+                                                            @if ($lap->akun_debet == 'Kas')
+                                                                <td class="text-success">
+                                                                    {{ 'Rp ' . number_format($lap->debit, 0, ',', '.') }}
                                                                 </td>
                                                                 <td>Rp. 0</td>
-                                                            @elseif ($lap->akun_kredit == 'Kas' || in_array($lap->akun_kredit, $masterName))
+                                                            @elseif ($lap->akun_debet == 'Penjualan' || $lap->akun_kredit == 'Kas' || in_array($lap->akun_debet, $masterName))
                                                                 <td>Rp. 0</td>
-                                                                <td>{{ 'Rp ' . number_format($lap->kredit, 0, ',', '.') }}
+                                                                <td class="text-danger">
+                                                                    {{ 'Rp ' . number_format($lap->kredit, 0, ',', '.') }}
                                                                 </td>
                                                             @endif
-                                                            <td>{{ 'Rp ' . number_format($modalAwal, 0, ',', '.') }}</td>
+                                                            <td class="{{ $color }}">
+                                                                {{ 'Rp ' . number_format($modalAwal, 0, ',', '.') }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -121,7 +137,10 @@
                                                     @foreach ($penjualan as $lap)
                                                         @php
                                                             // Update nilai modal berdasarkan debit atau kredit
-                                                            if ($lap->akun_debet == 'Penjualan') {
+                                                            if (
+                                                                $lap->akun_debet == 'Penjualan' ||
+                                                                $lap->akun_debet == 'Kas'
+                                                            ) {
                                                                 $modalAwal += $lap->debit;
                                                             } elseif ($lap->akun_kredit == 'Kas') {
                                                                 $modalAwal -= $lap->kredit;
@@ -131,7 +150,7 @@
                                                             <td>{{ date('d/M/Y', strtotime($lap->created_at)) }}</td>
                                                             <td>{{ $lap->ket }}</td>
                                                             <td>{{ $lap->no_jurnal }}</td>
-                                                            @if ($lap->akun_debet == 'Penjualan')
+                                                            @if ($lap->akun_debet == 'Penjualan' || $lap->akun_debet == 'Kas')
                                                                 <td>Rp. 0</td>
                                                                 <td>{{ 'Rp ' . number_format($lap->debit, 0, ',', '.') }}
                                                                 </td>
@@ -143,6 +162,34 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                        <div class="tab-pane fade" id="pills-beli" role="tabpanel"
+                                            aria-labelledby="pills-beli-tab">
+                                            <table class="table table-responsive-lg">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th scope="col">Tanggal</th>
+                                                        <th scope="col">Keterangan</th>
+                                                        <th scope="col">Referensi</th>
+                                                        <th scope="col">Debit</th>
+                                                        <th scope="col">Kredit</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    @foreach ($beli as $lap)
+                                                        <tr>
+                                                            <td>{{ date('d/M/Y', strtotime($lap->created_at)) }}</td>
+                                                            <td>{{ $lap->ket }}</td>
+                                                            <td>{{ $lap->no_jurnal }}</td>
+                                                            <td>{{ 'Rp ' . number_format($lap->debit, 0, ',', '.') }}
+                                                            </td>
+                                                            <td>Rp. 0</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+
                                         <div class="tab-pane fade" id="pills-contact" role="tabpanel"
                                             aria-labelledby="pills-contact-tab">
                                             <table class="table table-responsive-lg">
@@ -162,9 +209,9 @@
                                                             <td>{{ date('d/M/Y', strtotime($lap->created_at)) }}</td>
                                                             <td>{{ $lap->ket }}</td>
                                                             <td>{{ $lap->no_jurnal }}</td>
-                                                            <td>Rp. 0</td>
-                                                            <td>{{ 'Rp ' . number_format($lap->kredit, 0, ',', '.') }}
+                                                            <td>{{ 'Rp ' . number_format($lap->debit, 0, ',', '.') }}
                                                             </td>
+                                                            <td>Rp. 0</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>

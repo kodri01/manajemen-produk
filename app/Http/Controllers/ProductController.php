@@ -367,7 +367,6 @@ class ProductController extends Controller
 
         $baku = BahanBaku::findOrFail($request->id);
         $baku->name = $request->name;
-
         $baku->save();
 
         return redirect()->back()->with('success', 'Data Berhasil diubah');

@@ -51,9 +51,9 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ date('d/M/Y', strtotime($kas->created_at)) }}</td>
-                                <td class="text-capitalize">{{ $kas->akun_kredit }}</td>
+                                <td class="text-capitalize">{{ $kas->akun_debet }}</td>
                                 <td>
-                                    {{ 'Rp ' . number_format($kas->kredit, 0, ',', '.') }}
+                                    {{ 'Rp ' . number_format($kas->debit, 0, ',', '.') }}
                                 </td>
                                 <td class="text-capitalize">{{ $kas->ket }}</td>
                                 <td><a href="#" data-toggle="modal" data-target="#supplierModalEdit"
