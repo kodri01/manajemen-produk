@@ -57,10 +57,12 @@
                                 </div>
 
                                 <div class="col-sm-6">
-                                    <span><b>{{ 'Rp ' . number_format($total, 0, ',', '.') }}</b></span>
+                                    <span><u class="mt-2">
+                                            <b>{{ 'Rp ' . number_format($total, 0, ',', '.') }}</b></u>
+                                        <sub>-</sub>
+                                    </span>
                                 </div>
                             </div>
-                            <hr style="margin-left:34rem;height: 1px; width:120px;background: #757272;">
                             <div class="row mb-3">
                                 <div class="col-sm-6">
                                     <span><b>Modal Akhir</b></span>

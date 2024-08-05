@@ -24,14 +24,20 @@
                                             aria-controls="pills-home" aria-selected="true">Kas</button>
                                     </li>
                                     <li class="nav-item mx-3" role="presentation">
-                                        <button class="nav-link btn-sm" id="pills-profile-tab" data-toggle="pill"
-                                            data-target="#pills-profile" type="button" role="tab"
-                                            aria-controls="pills-profile" aria-selected="false">Pendapatan</button>
-                                    </li>
-                                    <li class="nav-item mr-3" role="presentation">
                                         <button class="nav-link btn-sm" id="pills-beli-tab" data-toggle="pill"
                                             data-target="#pills-beli" type="button" role="tab"
-                                            aria-controls="pills-beli" aria-selected="false">Pembelian</button>
+                                            aria-controls="pills-beli" aria-selected="false">Persediaan</button>
+                                    </li>
+                                    <li class="nav-item " role="presentation">
+                                        <button class="nav-link btn-sm" id="pills-profile-tab" data-toggle="pill"
+                                            data-target="#pills-profile" type="button" role="tab"
+                                            aria-controls="pills-profile" aria-selected="false">Penjualan</button>
+                                    </li>
+
+                                    <li class="nav-item mx-3" role="presentation">
+                                        <button class="nav-link btn-sm" id="pills-hpp-tab" data-toggle="pill"
+                                            data-target="#pills-hpp" type="button" role="tab" aria-controls="pills-hpp"
+                                            aria-selected="false">HPP</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link btn-sm" id="pills-contact-tab" data-toggle="pill"
@@ -189,7 +195,31 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                        <div class="tab-pane fade" id="pills-hpp" role="tabpanel"
+                                            aria-labelledby="pills-hpp-tab">
+                                            <table class="table table-responsive-lg">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th scope="col">Tanggal</th>
+                                                        <th scope="col">Keterangan</th>
+                                                        <th scope="col">Debit</th>
+                                                        <th scope="col">Kredit</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
+                                                    @foreach ($hpps as $hpp)
+                                                        <tr>
+                                                            <td>{{ date('d/M/Y', strtotime($hpp->created_at)) }}</td>
+                                                            <td>{{ $hpp->kode_product }}</td>
+                                                            <td>{{ 'Rp ' . number_format($hpp->hpp, 0, ',', '.') }}
+                                                            </td>
+                                                            <td>Rp. 0</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
                                         <div class="tab-pane fade" id="pills-contact" role="tabpanel"
                                             aria-labelledby="pills-contact-tab">
                                             <table class="table table-responsive-lg">

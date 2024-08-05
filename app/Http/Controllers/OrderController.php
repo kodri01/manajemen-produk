@@ -97,7 +97,7 @@ class OrderController extends Controller
         Laporan::create([
             'no_jurnal' => $no_jurnal,
             'ket' => $no_order,
-            'akun_debet' => 'Pembelian',
+            'akun_debet' => 'Persediaan',
             'debit' => $total,
             'akun_kredit' => 'Kas',
             'kredit' => $total,

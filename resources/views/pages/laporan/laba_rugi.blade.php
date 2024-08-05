@@ -28,10 +28,19 @@
                             <span class="text-capitalize"><b>pendapatan</b></span>
                             <div class="row mb-3">
                                 <div class="col-sm-6">
-                                    <span>pendapatan usaha</span>
+                                    <span>Pendapatan Usaha</span>
                                 </div>
                                 <div class="col-sm-6">
-                                    <span>{{ 'Rp ' . number_format($pendapatan, 0, ',', '.') }}</span>
+                                    <span>{{ 'Rp ' . number_format($labaKotor, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <span>HPP</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <span><u class="mt-2">
+                                            {{ 'Rp ' . number_format($hpp, 0, ',', '.') }}</u>
+                                        <sub>_</sub>
+                                    </span>
                                 </div>
                                 <div class="col-sm-6">
                                     <span><b>Jumlah</b></span>
@@ -60,10 +69,12 @@
                                     <span>Pajak Penghasilan</span>
                                 </div>
                                 <div class="col-sm-6">
-                                    <span>{{ 'Rp ' . number_format($pajak, 0, ',', '.') }}</span>
+                                    <span><u class="mt-2">
+                                            {{ 'Rp ' . number_format($pajak, 0, ',', '.') }}</u>
+                                        <sub>-</sub>
+                                    </span>
                                 </div>
                             </div>
-                            <hr style="margin-left:34rem;height: 1px; width:120px;background: #757272;">
                             <div class="row mb-3">
                                 <div class="col-sm-6">
                                     <span><b>Laba Rugi Setelah Pajak Penghasilan</b></span>

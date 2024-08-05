@@ -124,7 +124,9 @@ class LaporanController extends Controller
             ->sum(DB::raw('debit'));
         // dd($kass);
         $bebanUsaha = $kass;
-        $labaKotor = ($pendapatanAwal + $transaksi->sell) - $produkSell;
+        // $labaKotor = ($pendapatanAwal + $transaksi->sell) - $produkSell;
+        $labaKotor = ($pendapatanAwal + $transaksi->sell);
+        // dd([$labaKotor, $labaKotor1]);
         // }
 
         if ($tahun != null) {
@@ -133,10 +135,11 @@ class LaporanController extends Controller
             $tahun[] = 2024;
         }
 
-        $pendapatan = $labaKotor;
+        $hpp = $produkSell;
+        $pendapatan = $labaKotor - $hpp;
         $labaRugi = $pendapatan - $bebanUsaha - $pajak;
 
-        return view('pages.laporan.laba_rugi', compact('setting', 'title', 'judul', 'tahun', 'pendapatan', 'bebanUsaha', 'pajak', 'labaRugi', 'selectedYear'));
+        return view('pages.laporan.laba_rugi', compact('setting', 'title', 'judul', 'tahun', 'labaKotor', 'hpp', 'pendapatan', 'bebanUsaha', 'pajak', 'labaRugi', 'selectedYear'));
     }
 
     public function per_modal(Request $request)
@@ -229,13 +232,17 @@ class LaporanController extends Controller
             ->select('akun_debet', 'debit', 'no_jurnal', 'ket', 'created_at')
             ->get();
 
-        $beli = Laporan::where('akun_debet', 'Pembelian')
+        $beli = Laporan::where('akun_debet', 'Persediaan')
             ->select('akun_debet', 'debit', 'no_jurnal', 'ket', 'created_at')
+            ->get();
+
+        $hpps = ProductSell::orderBy('created_at', 'asc')
+            ->select('kode_product', 'hpp', 'created_at')
             ->get();
 
         $beban = Laporan::whereIn('akun_debet', $masterName)
             ->select('akun_debet', 'debit', 'no_jurnal', 'ket', 'created_at')
             ->get();
-        return view('pages.laporan.buku_besar', compact('setting', 'title', 'judul', 'laporans', 'penjualan', 'beli', 'beban', 'masters', 'masterName'));
+        return view('pages.laporan.buku_besar', compact('setting', 'title', 'judul', 'hpps', 'laporans', 'penjualan', 'beli', 'beban', 'masters', 'masterName'));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BahanBaku;
+use App\Models\Laporan;
 use App\Models\Product;
 use App\Models\ProductSell;
 use App\Models\Resep;
@@ -122,7 +123,6 @@ class ProduksiController extends Controller
                 $produk_id = $resep->produk_id;
                 $baku_id = $resep->baku_id;
                 $qty = $resep->qty;
-                // Menggunakan harga rata-rata dari produk terkait
                 $hargaBaku = $produkHargaRataRata[$resep->produk->nama_barang];
                 $hargaProduksi = $qty * $hargaBaku;
                 $totalHargaBaku += $hargaProduksi;
@@ -143,9 +143,8 @@ class ProduksiController extends Controller
             ]);
         }
 
-
         $kdProduct = "SLL" . rand(1000, 9999) . date('dm');
-        ProductSell::create([
+        $sell = ProductSell::create([
             'no_resep' => $resep->no_resep,
             'kode_product' => $kdProduct,
             'nama_product' => $namaProduk,
@@ -153,6 +152,15 @@ class ProduksiController extends Controller
             'harga_jual' => $hargaJual,
             'qty_in' => $qtyIn,
             'qty_out' => 0,
+        ]);
+
+        Laporan::create([
+            'no_jurnal' => $sell->kode_product,
+            'ket' => 'HPP Produk',
+            'akun_debet' => 'HPP',
+            'debit' => $sell->hpp,
+            'akun_kredit' => 'Persediaan',
+            'kredit' => $sell->hpp,
         ]);
 
         return redirect()->route('persediaan')
