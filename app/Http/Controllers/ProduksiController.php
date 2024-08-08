@@ -154,15 +154,6 @@ class ProduksiController extends Controller
             'qty_out' => 0,
         ]);
 
-        Laporan::create([
-            'no_jurnal' => $sell->kode_product,
-            'ket' => 'HPP Produk',
-            'akun_debet' => 'HPP',
-            'debit' => $sell->hpp,
-            'akun_kredit' => 'Persediaan',
-            'kredit' => $sell->hpp,
-        ]);
-
         return redirect()->route('persediaan')
             ->with('success', 'Produksi Berhasil Ditambahkan');
     }

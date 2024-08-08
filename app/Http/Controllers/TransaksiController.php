@@ -89,13 +89,19 @@ class TransaksiController extends Controller
             $total += $totalSub;
         }
 
+        $hpp = $produk->hpp;
+
         Laporan::create([
             'no_jurnal' => $no_jurnal,
             'ket' => $no_transaksi,
             'akun_debet' => 'Kas',
             'debit' => $total,
-            'akun_kredit' => 'Pendapatan',
+            'akun_hpp' => 'HPP',
+            'hpp' => $hpp,
+            'akun_kredit' => 'Penjualan',
             'kredit' => $total,
+            'akun_persediaan' => 'Persediaan',
+            'persediaan' => $hpp,
         ]);
 
 

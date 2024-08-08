@@ -236,8 +236,8 @@ class LaporanController extends Controller
             ->select('akun_debet', 'debit', 'no_jurnal', 'ket', 'created_at')
             ->get();
 
-        $hpps = ProductSell::orderBy('created_at', 'asc')
-            ->select('kode_product', 'hpp', 'created_at')
+        $hpps = Laporan::where('akun_hpp', 'HPP')
+            ->select('akun_hpp', 'hpp', 'no_jurnal', 'ket', 'created_at')
             ->get();
 
         $beban = Laporan::whereIn('akun_debet', $masterName)

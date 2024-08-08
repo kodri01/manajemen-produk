@@ -202,6 +202,7 @@
                                                     <tr>
                                                         <th scope="col">Tanggal</th>
                                                         <th scope="col">Keterangan</th>
+                                                        <th scope="col">Referensi</th>
                                                         <th scope="col">Debit</th>
                                                         <th scope="col">Kredit</th>
                                                     </tr>
@@ -211,7 +212,8 @@
                                                     @foreach ($hpps as $hpp)
                                                         <tr>
                                                             <td>{{ date('d/M/Y', strtotime($hpp->created_at)) }}</td>
-                                                            <td>{{ $hpp->kode_product }}</td>
+                                                            <td>{{ $hpp->ket }}</td>
+                                                            <td>{{ $hpp->no_jurnal }}</td>
                                                             <td>{{ 'Rp ' . number_format($hpp->hpp, 0, ',', '.') }}
                                                             </td>
                                                             <td>Rp. 0</td>

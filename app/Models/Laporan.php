@@ -19,6 +19,10 @@ class Laporan extends Model
         'debit',
         'akun_kredit',
         'kredit',
+        'akun_hpp',
+        'hpp',
+        'akun_persediaan',
+        'persediaan',
     ];
 
     public function order()

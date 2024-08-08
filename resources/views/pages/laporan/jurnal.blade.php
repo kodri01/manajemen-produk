@@ -31,17 +31,42 @@
                                 <tbody>
                                     @foreach ($laporans as $lap)
                                         <tr>
-                                            <td>{{ date('d/M/Y', strtotime($lap->created_at)) }}</td>
-                                            <td>{{ $lap->no_jurnal }}</td>
-                                            <td>{{ $lap->ket }}</td>
-                                            <td>{{ $lap->akun_debet }}</td>
-                                            <td class="text-success">
-                                                {{ 'Rp ' . number_format($lap->debit, 0, ',', '.') }}
-                                            </td>
-                                            <td>{{ $lap->akun_kredit }}</td>
-                                            <td class="text-danger">
-                                                {{ 'Rp ' . number_format($lap->kredit, 0, ',', '.') }}
-                                            </td>
+
+                                            @if ($lap->akun_debet == 'Kas')
+                                                <td class="pt-4">{{ date('d/M/Y', strtotime($lap->created_at)) }}</td>
+                                                <td class="pt-4">{{ $lap->no_jurnal }}</td>
+                                                <td class="pt-4 ">{{ $lap->ket }}</td>
+                                                <td>{{ $lap->akun_debet }}
+                                                    <br> <label for="" class="mt-3">{{ $lap->akun_hpp }}</label>
+                                                </td>
+                                                <td class="text-success">
+                                                    {{ 'Rp ' . number_format($lap->debit, 0, ',', '.') }}
+                                                    <br> <label class="text-success mt-3">
+                                                        {{ 'Rp ' . number_format($lap->hpp, 0, ',', '.') }}</label>
+                                                </td>
+                                                <td class="pt-4">{{ $lap->akun_kredit }}
+                                                    <br> <label for=""
+                                                        class="mt-3">{{ $lap->akun_persediaan }}</label>
+                                                </td>
+                                                <td class="text-danger pt-4">
+                                                    {{ 'Rp ' . number_format($lap->kredit, 0, ',', '.') }} <br> <label
+                                                        class="text-danger mt-3">
+                                                        {{ 'Rp ' . number_format($lap->persediaan, 0, ',', '.') }}</label>
+                                                </td>
+                                            @else
+                                                <td>{{ date('d/M/Y', strtotime($lap->created_at)) }}</td>
+                                                <td>{{ $lap->no_jurnal }}</td>
+                                                <td>{{ $lap->ket }}</td>
+                                                <td>{{ $lap->akun_debet }}</td>
+                                                <td class="text-success">
+                                                    {{ 'Rp ' . number_format($lap->debit, 0, ',', '.') }}
+                                                </td>
+                                                <td class="pt-4">{{ $lap->akun_kredit }}</td>
+                                                <td class="text-danger pt-4">
+                                                    {{ 'Rp ' . number_format($lap->kredit, 0, ',', '.') }}
+                                                </td>
+                                            @endif
+
                                         </tr>
                                     @endforeach
                                 </tbody>
